@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "991067537705",
+    "project_id": "wesearch-c093d",
+    "storage_bucket": "wesearch-c093d.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:991067537705:android:51824acaeb2dbe21ccb738",
+        "android_client_info": {
+          "package_name": "com.wesearch"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "991067537705-tkt274avlf45nj0u1hqa7lmnmf86eres.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.wesearch",
+            "certificate_hash": "5e8f16062ea3cd2c4a0d547876baa6f38cabf625"
+          }
+        },
+        {
+          "client_id": "991067537705-cekh0cc7ov0a8877h8veu6f3n12pp1k2.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDvvokei9R3hMgux6L7SDjDFRs2XVQEt-w"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "991067537705-cekh0cc7ov0a8877h8veu6f3n12pp1k2.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
