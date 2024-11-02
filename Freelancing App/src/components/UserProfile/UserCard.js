@@ -1,10 +1,7 @@
 import {Image, StyleSheet, Text, View} from 'react-native';
 import React from 'react';
-import Profile from '../../assets/images/Profile.png';
 
 const UserCard = ({userInfo}) => {
-  console.log(userInfo.data.user.photo);
-
   return (
     <View style={{alignItems: 'center', justifyContent: 'center'}}>
       <View
@@ -17,7 +14,11 @@ const UserCard = ({userInfo}) => {
           marginTop: -50,
         }}>
         <Image
-          source={{uri:userInfo.data.user.photo,}}
+          source={
+            userInfo
+              ? require('../../assets/images/My.png')
+              : {uri: userInfo.data.user.photo}
+          }
           style={{height: 100, width: 100, borderRadius: 75}}
         />
       </View>
@@ -30,7 +31,7 @@ const UserCard = ({userInfo}) => {
           marginTop: 10,
         }}>
         <Text style={{color: 'black', fontSize: 18, fontWeight: '600'}}>
-          {userInfo.data.user.name}
+          {userInfo ? 'Ap' : userInfo.data.user.name}
         </Text>
         <View style={{flex: 0, flexDirection: 'row', alignItems: 'center'}}>
           <Image

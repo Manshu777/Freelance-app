@@ -4,6 +4,7 @@ import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
 import {UserProvider, UserContext} from './src/components/UserContext';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import Orientation from 'react-native-orientation-locker';
 
 // App all Screens and components
 import SplashScreen from './src/screens/auth/SplashScreen';

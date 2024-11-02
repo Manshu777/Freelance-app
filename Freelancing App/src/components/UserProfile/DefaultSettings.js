@@ -1,7 +1,6 @@
 import {
   FlatList,
   Image,
-  Modal,
   Text,
   TouchableOpacity,
   View,
@@ -16,16 +15,15 @@ import Facebook from '../../assets/images/FaceBook.png';
 import Insta from '../../assets/images/instagram.png';
 import Twitter from '../../assets/images/twitter.png';
 import Meta from '../../assets/images/meta.png';
-import {useNavigation} from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {useNavigation,CommonActions} from '@react-navigation/native';
+
+
 const {width} = Dimensions.get('window');
 
 const DefaultSettings = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const navigation = useNavigation();
-  const handleBackPress = () => {
-    navigation.navigate('SplashScreen');  
-  };
-  
 
   const SocialLinks = [
     {IconAddress: Facebook, Link: ''},
@@ -68,9 +66,21 @@ const DefaultSettings = () => {
     }
   };
 
-  const handleChatPress = () => {
-    navigation.navigate('Notification');
+  const handleLogout = async () => {
+    AsyncStorage.removeItem('userInfo');
+    try {
+      await AsyncStorage.removeItem('userInfo');
+      console.log('User info cleared from local storage');
+      navigation.dispatch(
+        CommonActions.reset({
+          index: 0,
+          routes: [{ name: 'SplashScreen' }],
+        }))
+    } catch (error) {
+      console.error('Failed to clear user info:', error);
+    }
   };
+
 
   return (
     <>
@@ -104,7 +114,7 @@ const DefaultSettings = () => {
       />
       <View
         style={{
-          width: width,
+          width: width * 1,
           flex: 0,
           paddingVertical: 25,
           alignItems: 'center',
@@ -130,7 +140,7 @@ const DefaultSettings = () => {
             shadowRadius: 4,
             elevation: 5,
           }}
-          onPress={handleBackPress}>
+          onPress={handleLogout}>
           <Text style={{color: '#E1353C', fontSize: 16, fontWeight: '600'}}>
             Logout
           </Text>
@@ -166,12 +176,15 @@ const styles = StyleSheet.create({
   section: {
     borderColor: '#D0D0D0',
     borderBottomWidth: 2,
+    width: width * 0.95,
+    alignItems: 'center',
   },
   sectionHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingVertical: 15,
+    width: '100%',
   },
   sectionTitle: {
     fontSize: 16,
@@ -186,6 +199,7 @@ const styles = StyleSheet.create({
     padding: 10,
     backgroundColor: '#f9f9f9',
     borderRadius: 5,
+    width: width * 0.9,
   },
   questionItem: {
     marginBottom: 10,

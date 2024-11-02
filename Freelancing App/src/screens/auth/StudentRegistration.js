@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -9,9 +9,12 @@ import {
   KeyboardAvoidingView,
   ScrollView,
   Platform,
-  Animated,
+  Image,
+  ActivityIndicator,
 } from 'react-native';
-import {useNavigation} from '@react-navigation/native';
+import { launchImageLibrary } from 'react-native-image-picker';
+import { useNavigation } from '@react-navigation/native';
+import { nanoid } from 'nanoid'; // Generate unique ID for token
 
 const StudentRegistration = () => {
   const navigation = useNavigation();
@@ -19,13 +22,16 @@ const StudentRegistration = () => {
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
   const [age, setAge] = useState('');
+  const [RegAs, setRegAs] = useState('Student');
   const [sportsCoach, setSportsCoach] = useState('');
   const [gender, setGender] = useState(null); // 'male' | 'female' | 'other'
   const [termsAccepted, setTermsAccepted] = useState(false);
+  const [image, setImage] = useState(null); // Store image URI
+  const [loading, setLoading] = useState(false); // Track loading state
 
   const validateEmail = email => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
-  const handleRegister = () => {
+  const handleRegister = async () => {
     if (!firstName || !lastName || !email || !age || !sportsCoach) {
       Alert.alert('Incomplete Fields', 'Please fill out all fields.');
       return;
@@ -35,15 +41,75 @@ const StudentRegistration = () => {
       return;
     }
     if (!termsAccepted) {
-      Alert.alert(
-        'Terms not accepted',
-        'You must accept the terms to register.',
-      );
+      Alert.alert('Terms not accepted', 'You must accept the terms to register.');
       return;
     }
-    const userInfo = {firstName, lastName, email, age, sportsCoach};
-    Alert.alert('Registration Successful', `Welcome, ${firstName}!`);
-    navigation.navigate('LoginSuccess',{userInfo});
+
+    setLoading(true); 
+
+    const tokenID = nanoid(64);
+    const userInfo = {
+      first_name: firstName,
+      last_name: lastName,
+      email,
+      age,
+      sports_coach: sportsCoach,
+      reg_as: RegAs,
+      gender,
+      token_id: tokenID,
+    };
+
+    const formData = new FormData();
+    formData.append('user_info', JSON.stringify(userInfo));
+    if (image) {
+      formData.append('profile_image', {
+        uri: image,
+        name: 'profile.jpg',
+        type: 'image/jpeg',
+      });
+    }
+
+    try {
+      const response = await fetch(
+        'http://192.168.1.3:8000/api/v1/students/create', // Update to your backend URL
+        {
+          method: 'POST',
+          headers: {
+            Accept: 'application/json',
+            'Content-Type': 'multipart/form-data',
+          },
+          body: formData,
+        },
+      );
+
+      if (response.ok) {
+        const result = await response.json();
+        Alert.alert('Success', 'Registration successful!');
+        // Optionally navigate or reset the form
+        // navigation.navigate('LoginSuccess'); // Uncomment if needed
+      } else {
+        const errorResult = await response.json();
+        Alert.alert('Error', errorResult.message || 'Registration failed. Please try again.');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      Alert.alert('Error', 'An unexpected error occurred. Please try again later.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleImagePicker = () => {
+    launchImageLibrary({ mediaType: 'photo' }, response => {
+      if (response.didCancel) {
+        console.log('User cancelled image picker');
+      } else if (response.errorMessage) {
+        console.error('Image Picker Error:', response.errorMessage);
+      } else if (response.assets && response.assets.length > 0) {
+        const source = response.assets[0].uri;
+        setImage(source);
+      }
+    });
   };
 
   const renderGenderOption = (label, value) => (
@@ -57,30 +123,40 @@ const StudentRegistration = () => {
 
   return (
     <KeyboardAvoidingView
-      style={{flex: 1}}
+      style={{ flex: 1 }}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
       <ScrollView contentContainerStyle={styles.container}>
         <Text style={styles.title}>Student Registration</Text>
+
+        <TouchableOpacity
+          style={styles.imagePicker}
+          onPress={handleImagePicker}>
+          {image ? (
+            <Image source={{ uri: image }} style={styles.imagePreview} />
+          ) : (
+            <Text style={styles.imagePickerText}>Select Profile Picture</Text>
+          )}
+        </TouchableOpacity>
 
         <TextInput
           style={styles.input}
           placeholder="First Name"
           value={firstName}
-          placeholderTextColor={'#808080'}
+          placeholderTextColor="#808080"
           onChangeText={setFirstName}
         />
         <TextInput
           style={styles.input}
           placeholder="Last Name"
           value={lastName}
-          placeholderTextColor={'#808080'}
+          placeholderTextColor="#808080"
           onChangeText={setLastName}
         />
         <TextInput
           style={styles.input}
           placeholder="Email"
           value={email}
-          placeholderTextColor={'#808080'}
+          placeholderTextColor="#808080"
           onChangeText={setEmail}
           keyboardType="email-address"
         />
@@ -88,7 +164,7 @@ const StudentRegistration = () => {
           style={styles.input}
           placeholder="Age"
           value={age}
-          placeholderTextColor={'#808080'}
+          placeholderTextColor="#808080"
           onChangeText={setAge}
           keyboardType="numeric"
         />
@@ -96,7 +172,7 @@ const StudentRegistration = () => {
           style={styles.input}
           value={sportsCoach}
           placeholder="Looking for which sports coach?"
-          placeholderTextColor={'#808080'}
+          placeholderTextColor="#808080"
           onChangeText={setSportsCoach}
         />
 
@@ -106,26 +182,35 @@ const StudentRegistration = () => {
           {renderGenderOption('Other', 'other')}
         </View>
 
-        <TouchableOpacity
-          style={styles.checkboxContainer}
-          onPress={() => setTermsAccepted(!termsAccepted)}>
-          <View
-            style={[styles.checkbox, termsAccepted && styles.checkboxSelected]}
-          />
+        <View style={{ flexDirection: 'row', alignItems: 'flex-end' }}>
+          <TouchableOpacity
+            style={styles.checkboxContainer}
+            onPress={() => setTermsAccepted(!termsAccepted)}>
+            <View
+              style={[
+                styles.checkbox,
+                termsAccepted && styles.checkboxSelected,
+              ]}
+            />
+          </TouchableOpacity>
           <Text style={styles.checkboxLabel}>
             I agree to the terms and conditions
           </Text>
-        </TouchableOpacity>
+        </View>
 
-        <TouchableOpacity
-          style={[
-            styles.registerButton,
-            !termsAccepted && styles.disabledButton,
-          ]}
-          onPress={handleRegister}
-          disabled={!termsAccepted}>
-          <Text style={styles.buttonText}>Register</Text>
-        </TouchableOpacity>
+        {loading ? (
+          <ActivityIndicator size="large" color="#4CAF50" />
+        ) : (
+          <TouchableOpacity
+            style={[
+              styles.registerButton,
+              !termsAccepted && styles.disabledButton,
+            ]}
+            onPress={handleRegister}
+            disabled={!termsAccepted}>
+            <Text style={styles.buttonText}>Register</Text>
+          </TouchableOpacity>
+        )}
       </ScrollView>
     </KeyboardAvoidingView>
   );
@@ -154,6 +239,9 @@ const styles = StyleSheet.create({
     marginBottom: 12,
     backgroundColor: '#fff',
   },
+  imagePicker: { alignItems: 'center', marginBottom: 15 },
+  imagePickerText: { fontSize: 16, color: '#4CAF50' },
+  imagePreview: { width: 100, height: 100, borderRadius: 50 },
   genderContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -164,18 +252,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 10,
     borderWidth: 1,
-    borderColor: '#ccc',
     borderRadius: 8,
     marginHorizontal: 5,
   },
-  selectedGender: {
-    backgroundColor: '#4CAF50',
-    borderColor: '#4CAF50',
-  },
-  genderText: {
-    color: '#333',
-    fontSize: 16,
-  },
+  selectedGender: { backgroundColor: '#4CAF50' },
   checkboxContainer: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -185,30 +265,18 @@ const styles = StyleSheet.create({
     width: 20,
     height: 20,
     borderWidth: 1,
+    borderRadius: 15,
     borderColor: '#333',
-    marginRight: 10,
   },
-  checkboxSelected: {
-    backgroundColor: '#4CAF50',
-  },
-  checkboxLabel: {
-    fontSize: 16,
-    color: '#333',
-  },
+  checkboxSelected: { backgroundColor: '#4CAF50' },
   registerButton: {
     backgroundColor: '#4CAF50',
     paddingVertical: 12,
     borderRadius: 8,
     marginTop: 20,
   },
-  disabledButton: {
-    backgroundColor: '#ccc',
-  },
-  buttonText: {
-    color: '#fff',
-    textAlign: 'center',
-    fontSize: 18,
-  },
+  disabledButton: { backgroundColor: '#ccc' },
+  buttonText: { color: '#fff', textAlign: 'center', fontSize: 18 },
 });
 
 export default StudentRegistration;

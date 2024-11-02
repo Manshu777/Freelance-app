@@ -123,7 +123,6 @@ const CoachRegistration = () => {
       socialLinks,
       LoginRole,
     };
-    // console.log(userInfo);
     navigation.navigate('LoginSuccess', {userInfo});
   };
 

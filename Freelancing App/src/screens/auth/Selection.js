@@ -20,16 +20,15 @@ const RoleSelectionScreen = () => {
   const navigation = useNavigation();
   const [loading, setLoading] = useState(false);
 
-  const handleRoleSelection = role => {
-    setLoading(true);
 
-    setTimeout(() => {
-      setLoading(false);
-      navigation.navigate(
-        role === 'Student' ? 'LoginScreen' : 'LoginScreen',
-      );
-    }, 0);
+  const handleRoleSelection = role => {
+    if (role === 'StudentLogin') {
+      navigation.navigate('LoginScreen', { role: 'Student' }); 
+    } else if (role === 'CoachLogin') {
+      navigation.navigate('LoginScreen', { role: 'Coach' });
+    }
   };
+
 
   return (
     <View style={localStyles.container}>

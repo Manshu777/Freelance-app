@@ -1,6 +1,10 @@
 import React, {useState, useEffect} from 'react';
 import {useNavigation} from '@react-navigation/native';
-import {GoogleSignin} from '@react-native-google-signin/google-signin';
+import auth from '@react-native-firebase/auth';
+import {
+  GoogleSignin,
+  statusCodes,
+} from '@react-native-google-signin/google-signin';
 import {
   TouchableOpacity,
   View,
@@ -19,7 +23,7 @@ import Emailicon from '../../assets/images/GoogleLogo.png';
 import downicon from '../../assets/images/carat-down.png';
 import styles from '../../styles/styles';
 
-const LoginScreen = () => {
+const LoginScreen = ({route}) => {
   const [selectedCountry, setSelectedCountry] = useState({
     name: 'India',
     code: '+91',
@@ -33,8 +37,11 @@ const LoginScreen = () => {
   const [loadingCountries, setLoadingCountries] = useState(false);
   const [page, setPage] = useState(0);
   const [isMoreLoading, setIsMoreLoading] = useState(false);
-  const countriesPerPage = 25;
+  const [confirm, setConfirm] = useState(null);
+  const [code, setCode] = useState('');
+  const [role, setRole] = useState('');
   const navigation = useNavigation();
+  const countriesPerPage = 15;
 
   useEffect(() => {
     if (modalVisible) {
@@ -42,102 +49,118 @@ const LoginScreen = () => {
     }
   }, [modalVisible]);
 
-  const loadInitialCountries = () => {
-    setLoadingCountries(true);
-    fetch('https://restcountries.com/v3.1/all')
-      .then(response => response.json())
-      .then(data => {
-        const formattedData = data
-          .map(country => ({
-            name: country.name.common,
-            code:
-              country.idd.root +
-              (country.idd.suffixes ? country.idd.suffixes[0] : ''),
-            flag: country.flags.png,
-          }))
-          .filter(
-            (country, index, self) =>
-              country.code &&
-              self.findIndex(c => c.code === country.code) === index,
-          );
-        const sortedData = formattedData.sort((a, b) =>
-          a.name.localeCompare(b.name),
+  useEffect(() => {
+    if (route.params?.role) {
+      setRole(route.params.role);
+    }
+  }, [route.params]);
+
+  const fetchCountryData = async () => {
+    try {
+      const response = await fetch('https://restcountries.com/v3.1/all');
+      const data = await response.json();
+
+      const formattedData = data
+        .map(country => ({
+          name: country.name.common,
+          code:
+            country.idd.root +
+            (country.idd.suffixes ? country.idd.suffixes[0] : ''),
+          flag: country.flags.png,
+        }))
+        .filter(
+          (country, index, self) =>
+            country.code &&
+            self.findIndex(c => c.code === country.code) === index,
         );
-        const india = sortedData.find(country => country.name === 'India');
-        setSelectedCountry(india || sortedData[0]);
-        setCountryOptions(sortedData.slice(0, countriesPerPage)); // Load first 25
-        setPage(1);
-        setLoadingCountries(false);
-      })
-      .catch(error => {
-        setErrorMessage('Failed to fetch country data. Please try again.');
-        setLoadingCountries(false);
-      });
+
+      return formattedData.sort((a, b) => a.name.localeCompare(b.name));
+    } catch (error) {
+      throw new Error('Failed to fetch country data. Please try again.');
+    }
   };
 
-  const loadMoreCountries = () => {
-    if (isMoreLoading || loadingCountries) return; // Prevent duplicate loads
+  const loadInitialCountries = async () => {
+    setLoadingCountries(true);
+    try {
+      const sortedData = await fetchCountryData();
+
+      const india = sortedData.find(country => country.name === 'India');
+      setSelectedCountry(india || sortedData[0]);
+      setCountryOptions(sortedData.slice(0, countriesPerPage));
+      setPage(1);
+    } catch (error) {
+      setErrorMessage(error.message);
+    } finally {
+      setLoadingCountries(false);
+    }
+  };
+
+  const loadMoreCountries = async () => {
+    if (isMoreLoading || loadingCountries) return;
     setIsMoreLoading(true);
 
-    const nextPage = page + 1;
-    fetch('https://restcountries.com/v3.1/all')
-      .then(response => response.json())
-      .then(data => {
-        const formattedData = data
-          .map(country => ({
-            name: country.name.common,
-            code:
-              country.idd.root +
-              (country.idd.suffixes ? country.idd.suffixes[0] : ''),
-            flag: country.flags.png,
-          }))
-          .filter(
-            (country, index, self) =>
-              country.code &&
-              self.findIndex(c => c.code === country.code) === index,
-          );
+    try {
+      const sortedData = await fetchCountryData();
 
-        const newCountries = formattedData.slice(
-          (nextPage - 1) * countriesPerPage,
-          nextPage * countriesPerPage,
-        );
+      const newCountries = sortedData.slice(
+        page * countriesPerPage,
+        (page + 1) * countriesPerPage,
+      );
 
-        setCountryOptions(prevOptions => [...prevOptions, ...newCountries]);
-        setPage(nextPage);
-        setIsMoreLoading(false);
-      })
-      .catch(error => {
-        console.error(error);
-        setIsMoreLoading(false);
-      });
+      setCountryOptions(prevOptions => [...prevOptions, ...newCountries]);
+      setPage(prevPage => prevPage + 1);
+    } catch (error) {
+      console.error(error);
+      setErrorMessage(error.message);
+    } finally {
+      setIsMoreLoading(false);
+    }
   };
 
-  const handlePhoneSubmit = () => {
-    const phonePattern = /^\d{10}$/;
-
-    if (!phonePattern.test(phoneNumber.trim())) {
-      setErrorMessage('Please enter a valid mobile number (10 digits).');
+  async function signInWithPhoneNumber(phoneNumber) {
+    if (!role) {
+      Alert.alert('Select Role', 'Please select a role before signing in.');
       return;
     }
 
-    setErrorMessage('');
-    setLoading(true);
+    try {
+      const confirmation = await auth().signInWithPhoneNumber(phoneNumber);
+      setConfirm(confirmation);
+      Alert.alert(
+        'OTP Sent',
+        'Please check your phone for the verification code.',
+      );
+      // handlePhoneLogin(role);
+      navigation.navigate('LoginOTPverify',{role});
+    } catch (error) {
+      console.error('Error during phone number sign-in:', error);
+      setErrorMessage('Failed to send OTP. Please try again.');
+    }
+  }
 
-    const formattedPhoneNumber = `${selectedCountry.code}${phoneNumber}`;
+  async function confirmCode() {
+    if (!code) {
+      setErrorMessage('Please enter the verification code.');
+      return;
+    }
+    try {
+      await confirm.confirm(code);
+      navigation.navigate('CoachRegistration');
+    } catch (error) {
+      console.log('Invalid code:', error);
+      setErrorMessage('Invalid verification code. Please try again.');
+    }
+  }
 
-    // Alert.alert(
-    //   'Number Submitted',
-    //   `Your mobile number ${formattedPhoneNumber} has been submitted.`,
-    // );
-
-    navigation.navigate('Home');
-
-    setLoading(false);
-  };
-
-  const handleEmailPress = () => {
-    navigation.navigate('LoginWithEmail');
-  };
+  useEffect(() => {
+    const subscriber = auth().onAuthStateChanged(user => {
+      if (user) {
+        console.log('User logged in:', user);
+      }
+    });
+    return subscriber;
+  }, []);
 
   const renderFooter = () => {
     return isMoreLoading ? (
@@ -155,17 +178,42 @@ const LoginScreen = () => {
   }, []);
 
   const handleGoogleSignIn = async () => {
+    if (!role) {
+      Alert.alert('Select Role', 'Please select a role before signing in.');
+      return;
+    }
+
     setLoading(true);
     try {
       await GoogleSignin.hasPlayServices();
       const userInfo = await GoogleSignin.signIn();
-      console.log('User Info:', userInfo);
-      navigation.navigate('LoginSuccess');
+
+      if (userInfo && userInfo.data.user && userInfo.data.idToken) {
+        handleEmailLogin(role, userInfo);
+      } else {
+        throw {code: statusCodes.SIGN_IN_CANCELLED, message: 'Login canceled.'};
+      }
     } catch (error) {
-      console.error(error);
-      Alert.alert('Login Failed', 'An error occurred during Google Sign-In.');
+      console.log('Full Error:', error);
+
+      if (error?.code === statusCodes.SIGN_IN_CANCELLED) {
+        Alert.alert(
+          'Sign-In Canceled',
+          'You canceled the Google sign-in process.',
+        );
+      } else {
+        Alert.alert('Login Failed', 'An error occurred during Google Sign-In.');
+      }
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleEmailLogin = (role, userInfo) => {
+    if (role === 'Student') {
+      navigation.navigate('LoginSuccess',{userInfo,role});
+    } else if (role === 'Coach') {
+      navigation.navigate('CoachRegistration', {userInfo, logmethod: 'Email',role});
     }
   };
 
@@ -221,7 +269,9 @@ const LoginScreen = () => {
 
         <TouchableOpacity
           style={styles.SendOTP}
-          onPress={handlePhoneSubmit}
+          onPress={() =>
+            signInWithPhoneNumber(selectedCountry.code + phoneNumber)
+          }
           disabled={loading}
           accessibilityLabel="Submit Phone Number button">
           {loading ? (
