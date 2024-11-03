@@ -23,32 +23,29 @@ const daysOfWeek = [
 ];
 
 const specializationOptions = [
-  {label: 'Select your specialization', value: ''},
-  {label: 'Football', value: 'football'},
-  {label: 'Basketball', value: 'basketball'},
-  {label: 'Tennis', value: 'tennis'},
-  {label: 'Swimming', value: 'swimming'},
-  {label: 'Athletics', value: 'athletics'},
+  {label: 'Select specialization needed', value: ''},
+  {label: 'Web Development', value: 'web_development'},
+  {label: 'Graphic Design', value: 'graphic_design'},
+  {label: 'Digital Marketing', value: 'digital_marketing'},
+  {label: 'Writing & Translation', value: 'writing_translation'},
+  {label: 'Video Editing', value: 'video_editing'},
 ];
 
 const CoachRegistration = () => {
   const [currentStep, setCurrentStep] = useState(1);
-  const [FName, setFName] = useState('');
-  const [LName, setLName] = useState('');
-  const [LoginMethod, setLoginMethod] = useState('');
-  const [LoginRole, setLoginRole] = useState('');
-  const [Contact, setContact] = useState('');
-  const [phoneNumber, setPhoneNumber] = useState('');
-  const [coachingExperience, setCoachingExperience] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [contactMethod, setContactMethod] = useState('');
+  const [contact, setContact] = useState('');
+  const [projectDescription, setProjectDescription] = useState('');
   const [specialization, setSpecialization] = useState('');
   const [city, setCity] = useState('');
   const [availabilityDays, setAvailabilityDays] = useState([]);
   const [availableFrom, setAvailableFrom] = useState('');
   const [availableTo, setAvailableTo] = useState('');
-  const [socialLinks, setSocialLinks] = useState('');
+  const [budget, setBudget] = useState('');
   const [agreedTerms, setAgreedTerms] = useState(false);
 
-  // Time Picker State
   const [showFromPicker, setShowFromPicker] = useState(false);
   const [showToPicker, setShowToPicker] = useState(false);
   const [selectedFromTime, setSelectedFromTime] = useState(new Date());
@@ -58,9 +55,8 @@ const CoachRegistration = () => {
   const navigation = useNavigation();
 
   useEffect(() => {
-    if (route.params?.logmethod && route.params?.role) {
-      setLoginMethod(route.params.logmethod);
-      setLoginRole(route.params.role);
+    if (route.params?.contactMethod) {
+      setContactMethod(route.params.contactMethod);
     }
   }, [route.params]);
 
@@ -108,61 +104,64 @@ const CoachRegistration = () => {
       Alert.alert('Terms & Conditions', 'Please agree to the terms.');
       return;
     }
-    Alert.alert('Success', 'Registration submitted successfully!');
+    Alert.alert('Success', 'Freelancer hiring request submitted successfully!');
 
-    const userInfo = {
-      FName,
-      LName,
-      Contact,
-      coachingExperience,
+    const hiringInfo = {
+      firstName,
+      lastName,
+      contact,
+      projectDescription,
       specialization,
       city,
       availabilityDays,
       availableFrom,
       availableTo,
-      socialLinks,
-      LoginRole,
+      budget,
+      contactMethod,
     };
-    navigation.navigate('LoginSuccess', {userInfo});
-  };
-
-  const handleConfirm = () => {
-    setModalVisible(false);
-    Alert.alert('Success', 'Registration submitted successfully!');
-  };
-
-  const toggleLoginMethod = () => {
-    setLoginMethod(prevMethod => (prevMethod === 'Email' ? 'Email' : 'Phone'));
+    navigation.navigate('HiringSuccess', {hiringInfo});
   };
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.header}>Coach Registration</Text>
+      <Text style={styles.header}>Freelancer Hiring</Text>
 
       {currentStep === 1 && (
         <View style={styles.stepContainer}>
           <Text style={styles.label}>First Name</Text>
           <TextInput
             style={styles.input}
-            value={FName}
-            onChangeText={setFName}
+            value={firstName}
+            onChangeText={setFirstName}
             placeholder="Enter your First name"
             placeholderTextColor="#808080"
           />
           <Text style={styles.label}>Last Name</Text>
           <TextInput
             style={styles.input}
-            value={LName}
-            onChangeText={setLName}
+            value={lastName}
+            onChangeText={setLastName}
             placeholder="Enter your Last name"
             placeholderTextColor="#808080"
           />
-          {LoginMethod === 'Email' ? (
+          {contactMethod === 'Email' ? (
+            <>
+              <Text style={styles.label}>Email</Text>
+              <TextInput
+                style={styles.input}
+                value={contact}
+                onChangeText={setContact}
+                placeholder="Enter your Email Address"
+                placeholderTextColor="#808080"
+                keyboardType="email-address"
+              />
+            </>
+          ) : (
             <>
               <Text style={styles.label}>Phone Number</Text>
               <TextInput
                 style={styles.input}
-                value={Contact}
+                value={contact}
                 onChangeText={setContact}
                 placeholder="Enter your Phone Number"
                 placeholderTextColor="#808080"
@@ -170,34 +169,21 @@ const CoachRegistration = () => {
                 keyboardType="phone-pad"
               />
             </>
-          ) : (
-            <>
-              <Text style={styles.label}>Email</Text>
-              <TextInput
-                style={styles.input}
-                value={Contact}
-                onChangeText={setContact}
-                placeholder="Enter your Email Address"
-                placeholderTextColor="#808080"
-                keyboardType="email-address"
-              />
-            </>
           )}
-          <Text style={styles.label}>Experience</Text>
+          <Text style={styles.label}>Project Description</Text>
           <TextInput
             style={styles.input}
-            value={coachingExperience}
-            onChangeText={setCoachingExperience}
-            placeholder="Enter years of experience"
+            value={projectDescription}
+            onChangeText={setProjectDescription}
+            placeholder="Describe the project details"
             placeholderTextColor="#808080"
-            keyboardType="numeric"
           />
-          <Text style={styles.label}>Specialization</Text>
+          <Text style={styles.label}>Specialization Needed</Text>
           <TextInput
             style={styles.input}
             value={specialization}
             onChangeText={setSpecialization}
-            placeholder="Enter your specialization (e.g., Football)"
+            placeholder="Enter required specialization (e.g., Web Development)"
             placeholderTextColor="#808080"
           />
         </View>
@@ -283,56 +269,48 @@ const CoachRegistration = () => {
             </View>
           </View>
 
-          <Text style={styles.label}>Social Media Links</Text>
+          <Text style={styles.label}>Budget</Text>
           <TextInput
             style={styles.input}
-            value={socialLinks}
-            onChangeText={setSocialLinks}
-            placeholder="Enter social media links (optional)"
+            value={budget}
+            onChangeText={setBudget}
+            placeholder="Enter your budget"
             placeholderTextColor="#808080"
+            keyboardType="numeric"
           />
-          <View style={styles.termsContainer}>
-            <Text style={styles.label}>Terms and Conditions</Text>
-            <Text style={styles.termsText}>
-              By registering, you agree to our Terms and Conditions.
-            </Text>
-            <TouchableOpacity onPress={() => setAgreedTerms(!agreedTerms)}>
-              <View style={styles.checkbox}>
-                <Image
-                  source={
-                    agreedTerms
-                      ? require('../../assets/images/Thik.png')
-                      : require('../../assets/images/Uncheck.png')
-                  }
-                  style={styles.checkboxImage}
-                />
-                <Text style={styles.checkboxText}>I agree</Text>
-              </View>
-            </TouchableOpacity>
-          </View>
+
+          <TouchableOpacity onPress={() => setAgreedTerms(!agreedTerms)}>
+            <View style={styles.checkbox}>
+              <Image
+                source={
+                  agreedTerms
+                    ? require('../../assets/images/Thik.png')
+                    : require('../../assets/images/Uncheck.png')
+                }
+                style={styles.checkboxImage}
+              />
+              <Text style={styles.checkboxText}>
+                I agree to Terms & Conditions
+              </Text>
+            </View>
+          </TouchableOpacity>
         </View>
       )}
 
       <View style={styles.buttonContainer}>
-        {currentStep < 2 && (
+        {currentStep < 2 ? (
           <TouchableOpacity style={styles.button} onPress={handleNext}>
             <Text style={styles.buttonText}>Next</Text>
           </TouchableOpacity>
+        ) : (
+          <TouchableOpacity style={styles.button} onPress={handleSubmit}>
+            <Text style={styles.buttonText}>Submit</Text>
+          </TouchableOpacity>
         )}
         {currentStep > 1 && (
-          <View
-            style={{
-              width: '100%',
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-            }}>
-            <TouchableOpacity style={styles.button} onPress={handlePrev}>
-              <Text style={styles.buttonText}>Previous</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.button} onPress={handleSubmit}>
-              <Text style={styles.buttonText}>Registration</Text>
-            </TouchableOpacity>
-          </View>
+          <TouchableOpacity style={styles.button} onPress={handlePrev}>
+            <Text style={styles.buttonText}>Back</Text>
+          </TouchableOpacity>
         )}
       </View>
     </ScrollView>
