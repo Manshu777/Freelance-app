@@ -33,81 +33,47 @@ const StudentRegistration = () => {
   const validateEmail = email => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
   const handleRegister = async () => {
-    if (!firstName || !lastName || !email || !age || !sportsCoach) {
-      Alert.alert('Incomplete Fields', 'Please fill out all fields.');
-      return;
-    }
-    if (!validateEmail(email)) {
-      Alert.alert('Invalid Email', 'Please enter a valid email address.');
-      return;
-    }
-    if (!termsAccepted) {
-      Alert.alert(
-        'Terms not accepted',
-        'You must accept the terms to register.',
-      );
-      return;
-    }
+    const fetchStudents = async () => {
+      try {
+        const response = await fetch('http://localhost:8000/api/students');
+        
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
 
-    setLoading(true);
+        const data = await response.json();
+        console.error('Error fetching students:', data);
 
-    const tokenID = nanoid(64);
-    const userInfo = {
-      first_name: firstName,
-      last_name: lastName,
-      email,
-      age,
-      sports_coach: sportsCoach,
-      reg_as: RegAs,
-      gender,
-      token_id: tokenID,
+      } catch (error) {
+        console.error('Error fetching students:', error);
+
+      }
     };
 
-    const formData = new FormData();
-    formData.append('user_info', JSON.stringify(userInfo));
-    if (image) {
-      formData.append('profile_image', {
-        uri: image,
-        name: 'profile.jpg',
-        type: 'image/jpeg',
-      });
-    }
-
-    try {
-      const response = await fetch(
-        'http://192.168.1.3:8000/api/v1/students/create', // Update to your backend URL
-        {
-          method: 'POST',
-          headers: {
-            Accept: 'application/json',
-            'Content-Type': 'multipart/form-data',
-          },
-          body: formData,
-        },
-      );
-
-      if (response.ok) {
-        const result = await response.json();
-        Alert.alert('Success', 'Registration successful!');
-        // Optionally navigate or reset the form
-        // navigation.navigate('LoginSuccess'); // Uncomment if needed
-      } else {
-        const errorResult = await response.json();
-        Alert.alert(
-          'Error',
-          errorResult.message || 'Registration failed. Please try again.',
-        );
-      }
-    } catch (error) {
-      console.error('Error:', error);
-      Alert.alert(
-        'Error',
-        'An unexpected error occurred. Please try again later.',
-      );
-    } finally {
-      setLoading(false);
-    }
+    fetchStudents();
   };
+
+  useEffect(() => {
+    const fetchStudents = async () => {
+      try {
+        const response = await fetch('http://localhost:8000/api/students');
+        
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+
+        const data = await response.json();
+        console.error('Error fetching students:', data);
+
+      } catch (error) {
+        console.error('Error fetching students:', error);
+
+      }
+    };
+
+    fetchStudents();
+  }, []);
+  
 
   const handleImagePicker = () => {
     launchImageLibrary({mediaType: 'photo'}, response => {
