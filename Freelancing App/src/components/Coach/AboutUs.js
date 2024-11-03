@@ -7,67 +7,56 @@ import {
   TextInput,
   Button,
   StyleSheet,
+  FlatList,
 } from 'react-native';
-import styles from '../../styles/CoachProfilecss';
 
 const AboutUs = () => {
   const [isEditModalVisible, setIsEditModalVisible] = useState(false);
-  const [coaches, setCoaches] = useState([
-    {
-      description:
-        'I’m Rishav Agnihotri, a dedicated coach with a passion for football, tennis, and basketball. My journey spans from player to coach, focusing on skill development and personal growth. I’m committed to helping athletes of all levels reach their full potential.',
-    },
-    {
-      category: 'Football Coaches',
-      description:
-        'Experienced professionals focusing on technical skills, tactical awareness, and fitness. They help players of all levels develop their game and passion for football.',
-      expertise:
-        'Experts in technique and strategy, dedicated to improving your game. They offer personalized coaching to help players of all ages enhance their skills.',
-    },
-    {
-      category: 'Tennis Coaches',
-      description:
-        'Dynamic and experienced, focusing on skill development, game strategy, and teamwork. They tailor sessions to individual needs, fostering growth and sportsmanship.',
-    },
-    {
-      category: 'Basketball Coaches',
-      description:
-        'Dynamic and experienced, focusing on skill development, game strategy, and teamwork. They tailor sessions to individual needs, fostering growth and sportsmanship.',
-    },
+  const [aboutDescription, setAboutDescription] = useState(
+    'I am a dedicated freelancer with expertise in various fields to help clients achieve their goals.'
+  );
+  const [services, setServices] = useState([
+    { id: 1, name: 'Web Development', description: 'Building responsive websites.' },
+    { id: 2, name: 'SEO Optimization', description: 'Improving search engine rankings.' },
   ]);
+  const [newService, setNewService] = useState({ name: '', description: '' });
 
   const handleSave = () => {
     setIsEditModalVisible(false);
-    // Here, you would save the data to the server or update the state
   };
 
   const handleCancel = () => {
     setIsEditModalVisible(false);
-    // Optionally, reset any changes made during editing
   };
 
-  const updateField = (index, key, value) => {
-    const updatedCoaches = [...coaches];
-    updatedCoaches[index][key] = value;
-    setCoaches(updatedCoaches);
+  const addService = () => {
+    if (newService.name && newService.description) {
+      setServices([...services, { ...newService, id: services.length + 1 }]);
+      setNewService({ name: '', description: '' });
+    }
+  };
+
+  const updateService = (index, key, value) => {
+    const updatedServices = [...services];
+    updatedServices[index][key] = value;
+    setServices(updatedServices);
   };
 
   return (
     <View>
       <TouchableOpacity
-        style={styless.editButton}
+        style={styles.editButton}
         onPress={() => setIsEditModalVisible(true)}>
-        <Text style={styless.editButtonText}>Edit About Us</Text>
+        <Text style={styles.editButtonText}>Edit About Us & Services</Text>
       </TouchableOpacity>
 
-      <Text style={styles.contentText}>{coaches[0].description}</Text>
-      {coaches.slice(1).map((coach, index) => (
-        <View key={index} style={styles.coachContainer}>
-          <Text style={styles.categoryText}>{coach.category}</Text>
-          <Text style={styles.descriptionText}>{coach.description}</Text>
-          {coach.expertise && (
-            <Text style={styles.expertiseText}>{coach.expertise}</Text>
-          )}
+      <Text style={styles.contentText}>{aboutDescription}</Text>
+
+      <Text style={styles.servicesTitle}>Services Provided:</Text>
+      {services.map((service, index) => (
+        <View key={service.id} style={styles.serviceContainer}>
+          <Text style={styles.serviceName}>{service.name}</Text>
+          <Text style={styles.serviceDescription}>{service.description}</Text>
         </View>
       ))}
 
@@ -76,45 +65,59 @@ const AboutUs = () => {
         transparent={true}
         visible={isEditModalVisible}
         onRequestClose={handleCancel}>
-        <View style={styless.modalOverlay}>
-          <View style={styless.modalContainer}>
-            <Text style={styless.modalTitle}>Edit About Us</Text>
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContainer}>
+            <Text style={styles.modalTitle}>Edit About Us & Services</Text>
             <TextInput
-              style={styless.input}
-              value={coaches[0].description}
-              onChangeText={text => updateField(0, 'description', text)}
-              placeholder="Description"
+              style={styles.input}
+              value={aboutDescription}
+              onChangeText={setAboutDescription}
+              placeholder="About Us"
               multiline
             />
-            {coaches.slice(1).map((coach, index) => (
-              <View key={index} style={styless.editItemContainer}>
-                <TextInput
-                  style={styless.input}
-                  value={coach.category}
-                  onChangeText={text => updateField(index + 1, 'category', text)}
-                  placeholder="Category"
-                />
-                <TextInput
-                  style={styless.input}
-                  value={coach.description}
-                  onChangeText={text => updateField(index + 1, 'description', text)}
-                  placeholder="Description"
-                  multiline
-                />
-                {coach.expertise && (
-                  <TextInput
-                    style={styless.input}
-                    value={coach.expertise}
-                    onChangeText={text =>
-                      updateField(index + 1, 'expertise', text)
-                    }
-                    placeholder="Expertise"
-                  />
-                )}
-              </View>
-            ))}
 
-            <View style={styless.buttonContainer}>
+            <FlatList
+              data={services}
+              keyExtractor={(item) => item.id.toString()}
+              renderItem={({ item, index }) => (
+                <View style={styles.editItemContainer}>
+                  <TextInput
+                    style={styles.input}
+                    value={item.name}
+                    onChangeText={(text) => updateService(index, 'name', text)}
+                    placeholder="Service Name"
+                  />
+                  <TextInput
+                    style={styles.input}
+                    value={item.description}
+                    onChangeText={(text) => updateService(index, 'description', text)}
+                    placeholder="Service Description"
+                    multiline
+                  />
+                </View>
+              )}
+            />
+
+            <View style={styles.addServiceContainer}>
+              <TextInput
+                style={styles.input}
+                value={newService.name}
+                onChangeText={(text) => setNewService({ ...newService, name: text })}
+                placeholder="New Service Name"
+              />
+              <TextInput
+                style={styles.input}
+                value={newService.description}
+                onChangeText={(text) =>
+                  setNewService({ ...newService, description: text })
+                }
+                placeholder="New Service Description"
+                multiline
+              />
+              <Button title="Add Service" onPress={addService} />
+            </View>
+
+            <View style={styles.buttonContainer}>
               <Button title="Save" onPress={handleSave} />
               <Button title="Cancel" onPress={handleCancel} color="red" />
             </View>
@@ -127,7 +130,7 @@ const AboutUs = () => {
 
 export default AboutUs;
 
-const styless = StyleSheet.create({
+const styles = StyleSheet.create({
   modalOverlay: {
     flex: 1,
     justifyContent: 'center',
@@ -170,5 +173,30 @@ const styless = StyleSheet.create({
   editButtonText: {
     color: '#fff',
     fontSize: 16,
+  },
+  contentText: {
+    fontSize: 16,
+    padding: 10,
+  },
+  servicesTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginVertical: 10,
+  },
+  serviceContainer: {
+    padding: 10,
+    borderBottomWidth: 1,
+    borderColor: '#ccc',
+  },
+  serviceName: {
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  serviceDescription: {
+    fontSize: 14,
+    color: '#555',
+  },
+  addServiceContainer: {
+    marginTop: 15,
   },
 });

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, {useState} from 'react';
 import {
   View,
   Text,
@@ -12,9 +12,9 @@ import {
   Image,
   ActivityIndicator,
 } from 'react-native';
-import { launchImageLibrary } from 'react-native-image-picker';
-import { useNavigation } from '@react-navigation/native';
-import { nanoid } from 'nanoid'; // Generate unique ID for token
+import {launchImageLibrary} from 'react-native-image-picker';
+import {useNavigation} from '@react-navigation/native';
+import {nanoid} from 'nanoid'; // Generate unique ID for token
 
 const StudentRegistration = () => {
   const navigation = useNavigation();
@@ -41,11 +41,14 @@ const StudentRegistration = () => {
       return;
     }
     if (!termsAccepted) {
-      Alert.alert('Terms not accepted', 'You must accept the terms to register.');
+      Alert.alert(
+        'Terms not accepted',
+        'You must accept the terms to register.',
+      );
       return;
     }
 
-    setLoading(true); 
+    setLoading(true);
 
     const tokenID = nanoid(64);
     const userInfo = {
@@ -89,18 +92,24 @@ const StudentRegistration = () => {
         // navigation.navigate('LoginSuccess'); // Uncomment if needed
       } else {
         const errorResult = await response.json();
-        Alert.alert('Error', errorResult.message || 'Registration failed. Please try again.');
+        Alert.alert(
+          'Error',
+          errorResult.message || 'Registration failed. Please try again.',
+        );
       }
     } catch (error) {
       console.error('Error:', error);
-      Alert.alert('Error', 'An unexpected error occurred. Please try again later.');
+      Alert.alert(
+        'Error',
+        'An unexpected error occurred. Please try again later.',
+      );
     } finally {
       setLoading(false);
     }
   };
 
   const handleImagePicker = () => {
-    launchImageLibrary({ mediaType: 'photo' }, response => {
+    launchImageLibrary({mediaType: 'photo'}, response => {
       if (response.didCancel) {
         console.log('User cancelled image picker');
       } else if (response.errorMessage) {
@@ -117,13 +126,19 @@ const StudentRegistration = () => {
       style={[styles.genderOption, gender === value && styles.selectedGender]}
       onPress={() => setGender(value)}
       activeOpacity={0.8}>
-      <Text style={styles.genderText}>{label}</Text>
+      <Text
+        style={[
+          styles.genderText,
+          {color: gender === value ? '#FFFFFF' : '#808080'},
+        ]}>
+        {label}
+      </Text>
     </TouchableOpacity>
   );
 
   return (
     <KeyboardAvoidingView
-      style={{ flex: 1 }}
+      style={{flex: 1}}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
       <ScrollView contentContainerStyle={styles.container}>
         <Text style={styles.title}>Student Registration</Text>
@@ -132,9 +147,16 @@ const StudentRegistration = () => {
           style={styles.imagePicker}
           onPress={handleImagePicker}>
           {image ? (
-            <Image source={{ uri: image }} style={styles.imagePreview} />
+            
+            <View style={{flexDirection:'row',alignItems:'center',gap:10,justifyContent:'flex-start'}}>
+              <Image source={{uri: image}} style={styles.imagePre} />
+              <Text style={styles.imagePickerText}>Change Profile Picture</Text>
+            </View>
           ) : (
-            <Text style={styles.imagePickerText}>Select Profile Picture</Text>
+            <View style={{flexDirection:'row',alignItems:'center',gap:10,justifyContent:'flex-start'}}>
+              <Image source={require('../../assets/images/icosnds.png')} style={styles.imagePre} />
+              <Text style={styles.imagePickerText}>Select Profile Picture</Text>
+            </View>
           )}
         </TouchableOpacity>
 
@@ -171,7 +193,7 @@ const StudentRegistration = () => {
         <TextInput
           style={styles.input}
           value={sportsCoach}
-          placeholder="Looking for which sports coach?"
+          placeholder="What Skills You Have?"
           placeholderTextColor="#808080"
           onChangeText={setSportsCoach}
         />
@@ -182,7 +204,7 @@ const StudentRegistration = () => {
           {renderGenderOption('Other', 'other')}
         </View>
 
-        <View style={{ flexDirection: 'row', alignItems: 'flex-end' }}>
+        <View style={{flexDirection: 'row', alignItems: 'flex-end', gap: 10}}>
           <TouchableOpacity
             style={styles.checkboxContainer}
             onPress={() => setTermsAccepted(!termsAccepted)}>
@@ -193,7 +215,7 @@ const StudentRegistration = () => {
               ]}
             />
           </TouchableOpacity>
-          <Text style={styles.checkboxLabel}>
+          <Text style={[styles.checkboxLabel, {color: '#808080'}]}>
             I agree to the terms and conditions
           </Text>
         </View>
@@ -239,9 +261,10 @@ const styles = StyleSheet.create({
     marginBottom: 12,
     backgroundColor: '#fff',
   },
-  imagePicker: { alignItems: 'center', marginBottom: 15 },
-  imagePickerText: { fontSize: 16, color: '#4CAF50' },
-  imagePreview: { width: 100, height: 100, borderRadius: 50 },
+  imagePicker: {alignItems: 'center', marginBottom: 15},
+  imagePickerText: {fontSize: 16, color: 'rgba(126,88,199,1)'},
+  imagePreview: {width: 100, height: 100, borderRadius: 50},
+  imagePre: {width: 75, height: 75, borderRadius: 50},
   genderContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -255,7 +278,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     marginHorizontal: 5,
   },
-  selectedGender: { backgroundColor: '#4CAF50' },
+  selectedGender: {backgroundColor: 'rgba(126,88,199,1)'},
   checkboxContainer: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -268,15 +291,15 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     borderColor: '#333',
   },
-  checkboxSelected: { backgroundColor: '#4CAF50' },
+  checkboxSelected: {backgroundColor: 'rgba(126,88,199,1)'},
   registerButton: {
-    backgroundColor: '#4CAF50',
+    backgroundColor: 'rgba(126,88,199,1)',
     paddingVertical: 12,
     borderRadius: 8,
     marginTop: 20,
   },
-  disabledButton: { backgroundColor: '#ccc' },
-  buttonText: { color: '#fff', textAlign: 'center', fontSize: 18 },
+  disabledButton: {backgroundColor: '#ccc'},
+  buttonText: {color: '#fff', textAlign: 'center', fontSize: 18},
 });
 
 export default StudentRegistration;

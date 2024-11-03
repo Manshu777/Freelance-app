@@ -33,7 +33,7 @@ const RoleSelectionScreen = () => {
   return (
     <View style={localStyles.container}>
       <View style={localStyles.imagedesign}>
-        {/* <View style={localStyles.Cirdes}></View> */}
+        <View style={localStyles.Cirdes}></View>
         <View style={localStyles.imagebox}>
           <Image source={myImage} style={localStyles.image} />
         </View>
@@ -49,17 +49,18 @@ const RoleSelectionScreen = () => {
         <View style={localStyles.roleContainer}>
           <TouchableOpacity
             style={localStyles.roleOption}
-            onPress={() => handleRoleSelection('LoginScreen')}
+            onPress={() => handleRoleSelection('StudentLogin')}
             disabled={loading}>
             <Image source={studentImage} style={localStyles.roleImage} />
             <Text style={localStyles.roleText}>Freelancer</Text>
           </TouchableOpacity>
+
           <TouchableOpacity
             style={localStyles.roleOption}
-            onPress={() => handleRoleSelection('LoginScreen')}
+            onPress={() => handleRoleSelection('CoachLogin')}
             disabled={loading}>
             <Image source={coachImage} style={localStyles.roleImage} />
-            <Text style={localStyles.roleText}>Hiring</Text>
+            <Text style={localStyles.roleText}>Hire</Text>
           </TouchableOpacity>
         </View>
       </View>

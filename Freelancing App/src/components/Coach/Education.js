@@ -2,10 +2,10 @@ import React from 'react';
 import { View, Text, Image, TouchableOpacity } from 'react-native';
 import styles from '../../styles/CoachProfilecss';
 
-const Awards = ({ currentImageIndex, handleDotPress }) => {
-  const awards = [
+const Education = ({ activeImageIndex, handleDotPress }) => {
+  const achievements = [
     {
-      title: 'Awards',
+      title: 'Certificates',
       description:
         'Over the years, I’ve been honored with various awards for excellence in coaching and sports training, recognizing my commitment to developing athletes, innovative training methods, and significant contributions to youth sports.',
     },
@@ -38,26 +38,22 @@ const Awards = ({ currentImageIndex, handleDotPress }) => {
 
   return (
     <View>
-      {awards.map((award, index) => (
-        <View key={index} style={styles.awardContainer}>
-          <Text style={styles.titleText}>{award.title}</Text>
-          <Text style={styles.descriptionText}>{award.description}</Text>
-          {award.images && (
-            <View style={styles.certificateContainer}>
-              <Image source={award.images[currentImageIndex].url} style={styles.certificateImage} />
-              <View style={styles.dotContainer}>
-                {award.images.map((_, idx) => (
-                  <TouchableOpacity key={idx} onPress={() => handleDotPress(idx)} style={styles.dotButContainer}>
-                    <View style={[styles.dot, currentImageIndex === idx && styles.activeDot]} />
-                  </TouchableOpacity>
-                ))}
-              </View>
-            </View>
-          )}
-        </View>
-      ))}
+      <Text style={styles.contentText}>{achievements[0].description}</Text>
+      <Text style={styles.contentText}>{achievements[1].description}</Text>
+
+      <View style={styles.certificateContainer}>
+        <Image source={achievements[2].images[activeImageIndex].url} style={styles.certificateImage} />
+      </View>
+
+      <View style={styles.dotContainer}>
+        {achievements[2].images.map((_, index) => (
+          <TouchableOpacity key={index} onPress={() => handleDotPress(index)} style={styles.dotButContainer}>
+            <View style={[styles.dot, activeImageIndex === index && styles.activeDot]} />
+          </TouchableOpacity>
+        ))}
+      </View>
     </View>
   );
 };
 
-export default Awards;
+export default Education;

@@ -218,11 +218,12 @@ const styles = StyleSheet.create({
   otpInput: {
     borderColor: 'white',
     borderWidth: 1,
-    height: 60,
-    width: 60,
+    height: 47.5,
+    width: 47.5,
     borderRadius: 10,
     fontSize: 24,
     textAlign: 'center',
+    color:'white',
   },
   verifyButton: {
     backgroundColor: '#FFB900',

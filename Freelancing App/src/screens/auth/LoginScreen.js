@@ -211,7 +211,7 @@ const LoginScreen = ({route}) => {
 
   const handleEmailLogin = (role, userInfo) => {
     if (role === 'Student') {
-      navigation.navigate('LoginSuccess',{userInfo,role});
+      navigation.navigate('StudentRegistration',{userInfo,role});
     } else if (role === 'Coach') {
       navigation.navigate('CoachRegistration', {userInfo, logmethod: 'Email',role});
     }
