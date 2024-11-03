@@ -8,9 +8,9 @@ import {
   StyleSheet,
   Alert,
   Image,
-  Modal,
 } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import * as ImagePicker from 'react-native-image-picker';
 import {useNavigation, useRoute} from '@react-navigation/native';
 
 const daysOfWeek = [
@@ -40,12 +40,12 @@ const CoachRegistration = () => {
   const [projectDescription, setProjectDescription] = useState('');
   const [specialization, setSpecialization] = useState('');
   const [city, setCity] = useState('');
+  const [image, setImage] = useState(null);
   const [availabilityDays, setAvailabilityDays] = useState([]);
   const [availableFrom, setAvailableFrom] = useState('');
   const [availableTo, setAvailableTo] = useState('');
   const [budget, setBudget] = useState('');
   const [agreedTerms, setAgreedTerms] = useState(false);
-
   const [showFromPicker, setShowFromPicker] = useState(false);
   const [showToPicker, setShowToPicker] = useState(false);
   const [selectedFromTime, setSelectedFromTime] = useState(new Date());
@@ -60,12 +60,8 @@ const CoachRegistration = () => {
     }
   }, [route.params]);
 
-  const handleNext = () => {
-    if (currentStep < 2) setCurrentStep(prev => prev + 1);
-  };
-  const handlePrev = () => {
-    if (currentStep > 1) setCurrentStep(prev => prev - 1);
-  };
+  const handleNext = () => currentStep < 2 && setCurrentStep(prev => prev + 1);
+  const handlePrev = () => currentStep > 1 && setCurrentStep(prev => prev - 1);
 
   const handleDayToggle = day => {
     setAvailabilityDays(prev =>
@@ -73,38 +69,29 @@ const CoachRegistration = () => {
     );
   };
 
-  const handleFromTimeChange = (event, selectedDate) => {
-    const currentDate = selectedDate || selectedFromTime;
-    setShowFromPicker(false);
-    setSelectedFromTime(currentDate);
-    setAvailableFrom(
-      `${currentDate.getHours()}:${
-        currentDate.getMinutes() < 10
-          ? '0' + currentDate.getMinutes()
-          : currentDate.getMinutes()
-      }`,
-    );
+  const handleTimeChange = (setTime, setPickerVisible, selectedTime) => {
+    setPickerVisible(false);
+    if (selectedTime)
+      setTime(
+        selectedTime.toLocaleTimeString([], {
+          hour: '2-digit',
+          minute: '2-digit',
+        }),
+      );
   };
 
-  const handleToTimeChange = (event, selectedDate) => {
-    const currentDate = selectedDate || selectedToTime;
-    setShowToPicker(false);
-    setSelectedToTime(currentDate);
-    setAvailableTo(
-      `${currentDate.getHours()}:${
-        currentDate.getMinutes() < 10
-          ? '0' + currentDate.getMinutes()
-          : currentDate.getMinutes()
-      }`,
-    );
+  const handleImagePicker = () => {
+    ImagePicker.launchImageLibrary({mediaType: 'photo'}, response => {
+      if (response.didCancel) return console.log('User cancelled image picker');
+      if (response.errorMessage)
+        return console.error('Image Picker Error:', response.errorMessage);
+      if (response.assets?.length) setImage(response.assets[0].uri);
+    });
   };
 
   const handleSubmit = () => {
-    if (!agreedTerms) {
-      Alert.alert('Terms & Conditions', 'Please agree to the terms.');
-      return;
-    }
-    Alert.alert('Success', 'Freelancer hiring request submitted successfully!');
+    if (!agreedTerms)
+      return Alert.alert('Terms & Conditions', 'Please agree to the terms.');
 
     const hiringInfo = {
       firstName,
@@ -119,6 +106,8 @@ const CoachRegistration = () => {
       budget,
       contactMethod,
     };
+
+    Alert.alert('Success', 'Freelancer hiring request submitted successfully!');
     navigation.navigate('HiringSuccess', {hiringInfo});
   };
 
@@ -128,6 +117,41 @@ const CoachRegistration = () => {
 
       {currentStep === 1 && (
         <View style={styles.stepContainer}>
+          <TouchableOpacity
+            style={styles.imagePicker}
+            onPress={handleImagePicker}>
+            {image ? (
+              <View
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  gap: 10,
+                  justifyContent: 'flex-start',
+                }}>
+                <Image source={{uri: image}} style={styles.imagePre} />
+                <Text style={styles.imagePickerText}>
+                  Change Profile Picture
+                </Text>
+              </View>
+            ) : (
+              <View
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  gap: 10,
+                  justifyContent: 'flex-start',
+                }}>
+                <Image
+                  source={require('../../assets/images/icosnds.png')}
+                  style={styles.imagePre}
+                />
+                <Text style={styles.imagePickerText}>
+                  Select Profile Picture
+                </Text>
+              </View>
+            )}
+          </TouchableOpacity>
+
           <Text style={styles.label}>First Name</Text>
           <TextInput
             style={styles.input}
@@ -455,6 +479,10 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontWeight: 'bold',
   },
+  imagePicker: {alignItems: 'center', marginBottom: 15},
+  imagePickerText: {fontSize: 16, color: 'rgba(126,88,199,1)'},
+  imagePreview: {width: 100, height: 100, borderRadius: 50},
+  imagePre: {width: 75, height: 75, borderRadius: 50},
 });
 
 export default CoachRegistration;

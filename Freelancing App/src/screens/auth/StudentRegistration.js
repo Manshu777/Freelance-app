@@ -14,6 +14,7 @@ import {
 } from 'react-native';
 import {launchImageLibrary} from 'react-native-image-picker';
 import {useNavigation} from '@react-navigation/native';
+import * as ImagePicker from 'react-native-image-picker';
 import {nanoid} from 'nanoid'; // Generate unique ID for token
 
 const StudentRegistration = () => {
@@ -147,14 +148,28 @@ const StudentRegistration = () => {
           style={styles.imagePicker}
           onPress={handleImagePicker}>
           {image ? (
-            
-            <View style={{flexDirection:'row',alignItems:'center',gap:10,justifyContent:'flex-start'}}>
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                gap: 10,
+                justifyContent: 'flex-start',
+              }}>
               <Image source={{uri: image}} style={styles.imagePre} />
               <Text style={styles.imagePickerText}>Change Profile Picture</Text>
             </View>
           ) : (
-            <View style={{flexDirection:'row',alignItems:'center',gap:10,justifyContent:'flex-start'}}>
-              <Image source={require('../../assets/images/icosnds.png')} style={styles.imagePre} />
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                gap: 10,
+                justifyContent: 'flex-start',
+              }}>
+              <Image
+                source={require('../../assets/images/icosnds.png')}
+                style={styles.imagePre}
+              />
               <Text style={styles.imagePickerText}>Select Profile Picture</Text>
             </View>
           )}
