@@ -24,7 +24,7 @@ import CoachProfile from './src/screens/profile/CoachProfile';
 import Navigation from './src/components/navigation/Navigation';
 import Loading from './src/screens/Loading/Loading';
 
-import Testing from './src/components/Testing';
+// import Testing from './src/components/Testing';
 
 
 const Stack = createStackNavigator();
@@ -141,7 +141,7 @@ const App = () => {
                   name="StudentRegistration"
                   component={StudentRegistration}
                 />
-                <Stack.Screen name="Testing" component={Testing} />
+                {/* <Stack.Screen name="Testing" component={Testing} /> */}
                 <Stack.Screen name="Home" component={Home} />
                 <Stack.Screen name="User" component={User} />
                 <Stack.Screen name="Coach" component={Coach} />

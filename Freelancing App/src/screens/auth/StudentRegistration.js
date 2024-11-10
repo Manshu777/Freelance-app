@@ -17,7 +17,9 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import {useNavigation} from '@react-navigation/native';
 import * as ImagePicker from 'react-native-image-picker';
-import axios from 'axios';
+
+
+
 
 const StudentRegistration = () => {
   const navigation = useNavigation();
@@ -169,14 +171,15 @@ const StudentRegistration = () => {
           onChangeText={setEmail}
           keyboardType="email-address"
         />
-        <TextInput
-          style={styles.input}
-          placeholder="Age"
-          value={age}
-          placeholderTextColor="#808080"
-          onChangeText={setAge}
-          keyboardType="numeric"
-        />
+        <TouchableOpacity
+          onPress={() => setShowDatePicker(true)}
+          style={styles.input}>
+          <Text style={{color: dob ? '#000' : '#808080'}}>
+            {dob ? dob.toDateString() : 'Select Date of Birth'}
+          </Text>
+        </TouchableOpacity>
+
+
         <TextInput
           style={styles.input}
           value={sportsCoach}
