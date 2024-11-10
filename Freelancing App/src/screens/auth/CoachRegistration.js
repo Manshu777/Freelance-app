@@ -50,6 +50,7 @@ const CoachRegistration = () => {
   const [showToPicker, setShowToPicker] = useState(false);
   const [selectedFromTime, setSelectedFromTime] = useState(new Date());
   const [selectedToTime, setSelectedToTime] = useState(new Date());
+  const [responseMessage, setResponseMessage] = useState('');
 
   const route = useRoute();
   const navigation = useNavigation();
@@ -69,48 +70,106 @@ const CoachRegistration = () => {
     );
   };
 
-  const handleTimeChange = (setTime, setPickerVisible, selectedTime) => {
-    setPickerVisible(false);
-    if (selectedTime)
-      setTime(
+  const handleFromTimeChange = (event, selectedTime) => {
+    setShowFromPicker(false);
+    if (selectedTime) {
+      setAvailableFrom(
         selectedTime.toLocaleTimeString([], {
           hour: '2-digit',
           minute: '2-digit',
-        }),
+        })
       );
+      setSelectedFromTime(selectedTime);
+    }
+  };
+  
+  const handleToTimeChange = (event, selectedTime) => {
+    setShowToPicker(false);
+    if (selectedTime) {
+      setAvailableTo(
+        selectedTime.toLocaleTimeString([], {
+          hour: '2-digit',
+          minute: '2-digit',
+        })
+      );
+      setSelectedToTime(selectedTime);
+    }
   };
 
-  const handleImagePicker = () => {
-    ImagePicker.launchImageLibrary({mediaType: 'photo'}, response => {
-      if (response.didCancel) return console.log('User cancelled image picker');
-      if (response.errorMessage)
-        return console.error('Image Picker Error:', response.errorMessage);
-      if (response.assets?.length) setImage(response.assets[0].uri);
+  const handleChooseImage = () => {
+    ImagePicker.launchImageLibrary(
+      {mediaType: 'photo', includeBase64: false},
+      response => {
+        if (response.didCancel) {
+          Alert.alert('Cancelled image selection');
+        } else if (response.errorMessage) {
+          Alert.alert('Error: ' + response.errorMessage);
+        } else {
+          setImage(response.assets[0]);
+        }
+      },
+    );
+  };
+
+  const handleRegister = async () => {
+    Alert.alert('subbmitting');
+    if (!firstName || !lastName || !contact || !image) {
+      Alert.alert('Please fill all fields and choose an image');
+      return;
+    }
+
+    const formData = new FormData();
+
+    formData.append('image', {
+      uri: image.uri,
+      type: image.type,
+      name: image.fileName,
     });
+    formData.append('first_name', firstName);
+    formData.append('last_name', lastName);
+    formData.append('contact', contact);
+    formData.append('description', projectDescription);
+    formData.append('sports', specialization);
+    formData.append('city', city);
+    formData.append('available', availabilityDays);
+    console.log(availabilityDays)
+    formData.append('available_from', availableFrom);
+    formData.append('available_to', availableTo); 
+    formData.append('cost', budget);
+  
+    // formData.append('termsAccepted', termsAccepted.toString()); // Convert boolean to string
+
+    console.log(formData);
+
+    try {
+      const response = await fetch('http://10.0.2.2:8000/api/v1/CoachLogin', {
+        method: 'POST',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'multipart/form-data',
+        },
+        body: formData,
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        Alert.alert('Done');
+        setResponseMessage('Success: ' + JSON.stringify(data));
+        navigation.navigate('Home');
+      } else {
+        Alert.alert('Error');
+        setResponseMessage('Error: ' + JSON.stringify(data));
+        console.log(JSON.stringify(data));
+      }
+    } catch (error) {
+      setResponseMessage('Network Error: ' + error.message);
+    }
   };
 
-  const handleSubmit = () => {
-    if (!agreedTerms)
-      return Alert.alert('Terms & Conditions', 'Please agree to the terms.');
 
-    const hiringInfo = {
-      firstName,
-      lastName,
-      contact,
-      projectDescription,
-      specialization,
-      city,
-      availabilityDays,
-      availableFrom,
-      availableTo,
-      budget,
-      contactMethod,
-    };
 
-    Alert.alert('Success', 'Freelancer hiring request submitted successfully!');
-    navigation.navigate('HiringSuccess', {hiringInfo});
-  };
-
+  
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <Text style={styles.header}>Freelancer Hiring</Text>
