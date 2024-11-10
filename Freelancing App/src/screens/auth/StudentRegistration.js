@@ -11,81 +11,99 @@ import {
   Platform,
   Image,
   ActivityIndicator,
+  Button,
 } from 'react-native';
-import {launchImageLibrary} from 'react-native-image-picker';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import DateTimePicker from '@react-native-community/datetimepicker';
 import {useNavigation} from '@react-navigation/native';
 import * as ImagePicker from 'react-native-image-picker';
-import {nanoid} from 'nanoid'; // Generate unique ID for token
+import axios from 'axios';
 
 const StudentRegistration = () => {
   const navigation = useNavigation();
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
-  const [age, setAge] = useState('');
+  const [dob, setDob] = useState(new Date());
+  const [showDatePicker, setShowDatePicker] = useState(false);
   const [RegAs, setRegAs] = useState('Student');
   const [sportsCoach, setSportsCoach] = useState('');
-  const [gender, setGender] = useState(null); // 'male' | 'female' | 'other'
+  const [gender, setGender] = useState(null);
   const [termsAccepted, setTermsAccepted] = useState(false);
-  const [image, setImage] = useState(null); // Store image URI
-  const [loading, setLoading] = useState(false); // Track loading state
+  const [image, setImage] = useState(null);
+  const [token, setToken] = useState(null);
+  const [responseMessage, setResponseMessage] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const fiveYearsAgo = new Date();
+  fiveYearsAgo.setFullYear(fiveYearsAgo.getFullYear() - 5);
 
   const validateEmail = email => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
-  const handleRegister = async () => {
-    const fetchStudents = async () => {
-      try {
-        const response = await fetch('http://localhost:8000/api/students');
-        
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
+  const handleChooseImage = () => {
+    ImagePicker.launchImageLibrary(
+      {mediaType: 'photo', includeBase64: false},
+      response => {
+        if (response.didCancel) {
+          Alert.alert('Cancelled image selection');
+        } else if (response.errorMessage) {
+          Alert.alert('Error: ' + response.errorMessage);
+        } else {
+          setImage(response.assets[0]);
         }
-
-        const data = await response.json();
-        console.error('Error fetching students:', data);
-
-      } catch (error) {
-        console.error('Error fetching students:', error);
-
-      }
-    };
-
-    fetchStudents();
+      },
+    );
   };
 
-  useEffect(() => {
-    const fetchStudents = async () => {
-      try {
-        const response = await fetch('http://localhost:8000/api/students');
-        
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
+  const handleRegister = async () => {
+    Alert.alert('subbmitting');
+    if (!firstName || !lastName || !email || !image) {
+      Alert.alert('Please fill all fields and choose an image');
+      return;
+    }
 
-        const data = await response.json();
-        console.error('Error fetching students:', data);
+    const formData = new FormData();
 
-      } catch (error) {
-        console.error('Error fetching students:', error);
-
-      }
-    };
-
-    fetchStudents();
-  }, []);
-  
-
-  const handleImagePicker = () => {
-    launchImageLibrary({mediaType: 'photo'}, response => {
-      if (response.didCancel) {
-        console.log('User cancelled image picker');
-      } else if (response.errorMessage) {
-        console.error('Image Picker Error:', response.errorMessage);
-      } else if (response.assets && response.assets.length > 0) {
-        const source = response.assets[0].uri;
-        setImage(source);
-      }
+    formData.append('image', {
+      uri: image.uri,
+      type: image.type,
+      name: image.fileName,
     });
+    formData.append('first_name', firstName);
+    formData.append('last_name', lastName);
+    formData.append('email', email);
+    formData.append('age', dob.toISOString().split('T')[0]);
+    formData.append('sports', sportsCoach);
+    formData.append('gender', gender);
+    formData.append('reg_as', RegAs);
+    // formData.append('termsAccepted', termsAccepted.toString()); // Convert boolean to string
+
+    console.log(formData);
+
+    try {
+      const response = await fetch('http://10.0.2.2:8000/api/v1/students', {
+        method: 'POST',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'multipart/form-data',
+        },
+        body: formData,
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        Alert.alert('Done');
+        setResponseMessage('Success: ' + JSON.stringify(data));
+        navigation.navigate('Home');
+      } else {
+        Alert.alert('Error');
+        setResponseMessage('Error: ' + JSON.stringify(data));
+        console.log(JSON.stringify(data))
+      }
+    } catch (error) {
+      setResponseMessage('Network Error: ' + error.message);
+    }
   };
 
   const renderGenderOption = (label, value) => (
@@ -112,26 +130,14 @@ const StudentRegistration = () => {
 
         <TouchableOpacity
           style={styles.imagePicker}
-          onPress={handleImagePicker}>
+          onPress={handleChooseImage}>
           {image ? (
-            <View
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                gap: 10,
-                justifyContent: 'flex-start',
-              }}>
-              <Image source={{uri: image}} style={styles.imagePre} />
+            <View style={{flexDirection: 'row', alignItems: 'center', gap: 10}}>
+              <Image source={{uri: image.uri}} style={styles.imagePre} />
               <Text style={styles.imagePickerText}>Change Profile Picture</Text>
             </View>
           ) : (
-            <View
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                gap: 10,
-                justifyContent: 'flex-start',
-              }}>
+            <View style={{flexDirection: 'row', alignItems: 'center', gap: 10}}>
               <Image
                 source={require('../../assets/images/icosnds.png')}
                 style={styles.imagePre}

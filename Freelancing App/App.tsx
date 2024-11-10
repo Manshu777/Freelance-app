@@ -4,7 +4,6 @@ import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
 import {UserProvider, UserContext} from './src/components/UserContext';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import Orientation from 'react-native-orientation-locker';
 
 // App all Screens and components
 import SplashScreen from './src/screens/auth/SplashScreen';
@@ -25,12 +24,16 @@ import CoachProfile from './src/screens/profile/CoachProfile';
 import Navigation from './src/components/navigation/Navigation';
 import Loading from './src/screens/Loading/Loading';
 
+import Testing from './src/components/Testing';
+
+
 const Stack = createStackNavigator();
 
 const App = () => {
   const [currentRoute, setCurrentRoute] = useState(null);
   const [userInfo, setUserInfo] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [Token,setToken] = useState(null)
   let lastBackPressed = 0;
 
   const onStateChange = state => {
@@ -44,6 +47,19 @@ const App = () => {
       }
     }
   };
+
+
+  useEffect(() => {
+    const checkSession = async () => {
+      const storedToken = await AsyncStorage.getItem('authToken');
+      if (storedToken) {
+        setToken(storedToken);
+        navigation.navigate('Home');
+      }
+    };
+    checkSession();
+  }, []);
+
 
   useEffect(() => {
     const handleBackPress = () => {
@@ -125,6 +141,7 @@ const App = () => {
                   name="StudentRegistration"
                   component={StudentRegistration}
                 />
+                <Stack.Screen name="Testing" component={Testing} />
                 <Stack.Screen name="Home" component={Home} />
                 <Stack.Screen name="User" component={User} />
                 <Stack.Screen name="Coach" component={Coach} />
