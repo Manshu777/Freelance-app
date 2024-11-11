@@ -85,7 +85,7 @@ const localStyles = StyleSheet.create({
   Cirdes: {
     height: 458,
     width: 458,
-    backgroundColor: '#FFB900',
+    backgroundColor: '#78e0cc',
     position: 'absolute',
     top: -256,
     right: -284,
