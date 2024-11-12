@@ -19,7 +19,7 @@ const styles = StyleSheet.create({
   Cirdes: {
     height: 458,
     width: 458,
-    backgroundColor: '#FFB900',
+    backgroundColor: '#78e0cc',
     borderBottomColor: 150,
     position: 'absolute',
     top: -256,
@@ -163,7 +163,7 @@ const styles = StyleSheet.create({
   },
 
   SendOTP: {
-    backgroundColor: '#FFB900',
+    backgroundColor: '#78e0cc',
     borderRadius: 15,
     paddingVertical: 19.58,
     paddingHorizontal: 20,
@@ -202,7 +202,7 @@ const styles = StyleSheet.create({
     marginTop: 15,
   },
   linkText: {
-    color: '#FFB900',
+    color: '#78e0cc',
     textDecorationLine: 'none',
   },
 
@@ -226,7 +226,7 @@ const styles = StyleSheet.create({
     color:'white',
   },
   verifyButton: {
-    backgroundColor: '#FFB900',
+    backgroundColor: '#78e0cc',
     borderRadius: 15,
     paddingVertical: 19.58,
     paddingHorizontal: 20,
