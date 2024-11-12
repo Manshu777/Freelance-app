@@ -1,5 +1,5 @@
-import React, {useState, useEffect} from 'react';
-import {useNavigation} from '@react-navigation/native';
+import React, { useState, useEffect } from 'react';
+import { useNavigation } from '@react-navigation/native';
 import auth from '@react-native-firebase/auth';
 import {
   GoogleSignin,
@@ -23,11 +23,10 @@ import Emailicon from '../../assets/images/GoogleLogo.png';
 import downicon from '../../assets/images/carat-down.png';
 import styles from '../../styles/styles';
 
-
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchData } from '../../slices/dataSlice';
 
-const LoginScreen = ({route}) => {
+const LoginScreen = ({ route }) => {
   const [selectedCountry, setSelectedCountry] = useState({
     name: 'India',
     code: '+91',
@@ -43,10 +42,8 @@ const LoginScreen = ({route}) => {
   const [isMoreLoading, setIsMoreLoading] = useState(false);
   const [confirm, setConfirm] = useState(null);
   const [code, setCode] = useState('');
-  const [role, setRole] = useState('');
   const navigation = useNavigation();
   const countriesPerPage = 15;
-
 
   const dispatch = useDispatch();
   const data = useSelector((state) => state.data.data);
@@ -54,8 +51,6 @@ const LoginScreen = ({route}) => {
 
   useEffect(() => {
     dispatch(fetchData());
-
-    console.warn(data)
   }, [dispatch]);
 
   useEffect(() => {
@@ -63,12 +58,6 @@ const LoginScreen = ({route}) => {
       loadInitialCountries();
     }
   }, [modalVisible]);
-
-  useEffect(() => {
-    if (route.params?.role) {
-      setRole(route.params.role);
-    }
-  }, [route.params]);
 
   const fetchCountryData = async () => {
     try {
@@ -134,24 +123,18 @@ const LoginScreen = ({route}) => {
   };
 
   async function signInWithPhoneNumber(phoneNumber) {
-    if (!role) {
-      Alert.alert('Select Role', 'Please select a role before signing in.');
-      return;
-    }
-
-    try {
-      const confirmation = await auth().signInWithPhoneNumber(phoneNumber);
-      setConfirm(confirmation);
-      Alert.alert(
-        'OTP Sent',
-        'Please check your phone for the verification code.',
-      );
-      // handlePhoneLogin(role);
-      navigation.navigate('LoginOTPverify',{role});
-    } catch (error) {
-      console.error('Error during phone number sign-in:', error);
-      setErrorMessage('Failed to send OTP. Please try again.');
-    }
+    navigation.navigate('LoginOTPverify');
+    // try {
+    //   const confirmation = await auth().signInWithPhoneNumber(phoneNumber);
+    //   setConfirm(confirmation);
+    //   Alert.alert(
+    //     'OTP Sent',
+    //     'Please check your phone for the verification code.',
+    //   );
+    // } catch (error) {
+    //   console.error('Error during phone number sign-in:', error);
+    //   setErrorMessage('Failed to send OTP. Please try again.');
+    // }
   }
 
   async function confirmCode() {
@@ -193,10 +176,8 @@ const LoginScreen = ({route}) => {
   }, []);
 
   const handleGoogleSignIn = async () => {
-    if (!role) {
-      Alert.alert('Select Role', 'Please select a role before signing in.');
-      return;
-    }
+
+    const LogMethod = 'Email';
 
     setLoading(true);
     try {
@@ -204,9 +185,9 @@ const LoginScreen = ({route}) => {
       const userInfo = await GoogleSignin.signIn();
 
       if (userInfo && userInfo.data.user && userInfo.data.idToken) {
-        handleEmailLogin(role, userInfo);
+        navigation.navigate('StudentRegistration', { LogMethod });
       } else {
-        throw {code: statusCodes.SIGN_IN_CANCELLED, message: 'Login canceled.'};
+        throw { code: statusCodes.SIGN_IN_CANCELLED, message: 'Login canceled.' };
       }
     } catch (error) {
       console.log('Full Error:', error);
@@ -221,14 +202,6 @@ const LoginScreen = ({route}) => {
       }
     } finally {
       setLoading(false);
-    }
-  };
-
-  const handleEmailLogin = (role, userInfo) => {
-    if (role === 'Student') {
-      navigation.navigate('StudentRegistration',{userInfo,role});
-    } else if (role === 'Coach') {
-      navigation.navigate('CoachRegistration', {userInfo, logmethod: 'Email',role});
     }
   };
 
@@ -258,7 +231,7 @@ const LoginScreen = ({route}) => {
             {selectedCountry && (
               <>
                 <Image
-                  source={{uri: selectedCountry.flag}}
+                  source={{ uri: selectedCountry.flag }}
                   style={styles.flag}
                 />
                 <Text style={styles.countryCode}>{selectedCountry.code}</Text>
@@ -331,25 +304,24 @@ const LoginScreen = ({route}) => {
       </View>
 
       <Modal
-        animationType="slide"
-        transparent={true}
         visible={modalVisible}
+        transparent={true}
+        animationType="slide"
         onRequestClose={() => setModalVisible(false)}>
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Select Your Country</Text>
             <FlatList
               data={countryOptions}
-              keyExtractor={(item, index) =>
-                `${item.name}-${item.code}-${index}`
-              }
-              renderItem={({item}) => (
+              keyExtractor={(item) => item.code}
+              renderItem={({ item }) => (
                 <TouchableOpacity
-                  style={styles.countryOption}
+                  style={styles.countryItem}
                   onPress={() => {
                     setSelectedCountry(item);
                     setModalVisible(false);
                   }}>
-                  <Image source={{uri: item.flag}} style={styles.flag} />
+                  <Image source={{ uri: item.flag }} style={styles.flag} />
                   <Text style={styles.countryName}>{item.name}</Text>
                   <Text style={styles.countryCode}>{item.code}</Text>
                 </TouchableOpacity>
@@ -358,11 +330,6 @@ const LoginScreen = ({route}) => {
               onEndReachedThreshold={0.5}
               ListFooterComponent={renderFooter}
             />
-            <TouchableOpacity
-              onPress={() => setModalVisible(false)}
-              style={styles.closeButton}>
-              <Text style={styles.closeButtonText}>Close</Text>
-            </TouchableOpacity>
           </View>
         </View>
       </Modal>

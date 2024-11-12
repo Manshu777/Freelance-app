@@ -54,7 +54,7 @@ const Navigation = React.memo(({currentRoute}) => {
       {id: 3, name: 'Home', Component: Home, label: 'Home'},
       {id: 2, name: 'OurCoaches', Component: Search, label: 'Search'},
       {id: 1, name: 'Chat', Component: Message, label: 'Chat'},
-      {id: 4, name: NavigationPath, Component: Profile, label: 'Profile'},
+      {id: 4, name: 'Profile', Component: Profile, label: 'Profile'},
     ],
     [NavigationPath],
   );

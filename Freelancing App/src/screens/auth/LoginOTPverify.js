@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useRef} from 'react';
+import React, {useState, useEffect, useRef} from 'react'; 
 import {
   TouchableOpacity,
   View,
@@ -6,6 +6,7 @@ import {
   TextInput,
   Image,
   Linking,
+  Alert,
 } from 'react-native';
 import mobileVerify from '../../assets/images/mobileVerify.png';
 import MobileAlt from '../../assets/images/Mobile-alt.png';
@@ -18,16 +19,8 @@ const Loginotpverify = ({route}) => {
 
   const [otp, setOtp] = useState(['', '', '', '', '', '']);
   const [timer, setTimer] = useState(60);
-  const [role, setRole] = useState('');
   const [isOtpSent, setIsOtpSent] = useState(false);
   const inputRefs = Array.from({length: 6}, () => useRef(null));
-
-  useEffect(() => {
-    if (route.params?.role) {
-      console.log(route.params.role);
-      setRole(route.params.role);
-    }
-  }, [route.params]);
 
   useEffect(() => {
     let interval;
@@ -54,27 +47,14 @@ const Loginotpverify = ({route}) => {
     setOtp(newOtp);
   };
 
-  const handleVerifyOtp = async () => {
-    if (!role) {
-      Alert.alert('Select Role', 'Please select a role before signing in.');
-      return;
-    }
-
+  const handleVerifyOtp = async () => { 
     const fullOtp = otp.join('');
+    const LogMethod = "Phone";
+  
     if (fullOtp.length === 6) {
-      // console.log(role);
-      handlePhoneLogin(role);
-      // navigation.navigate('LoginSuccess');
+      navigation.navigate('StudentRegistration', { logmethod: LogMethod });
     } else {
-      alert('Please enter a valid 6-digit OTP');
-    }
-  };
-
-  const handlePhoneLogin = role => {
-    if (role === 'Student') {
-      navigation.navigate('StudentRegistration', role);
-    } else if (role === 'Coach') {
-      navigation.navigate('CoachRegistration', {logmethod: 'Phone', role});
+      Alert.alert('Invalid OTP', 'Please enter a valid 6-digit OTP');
     }
   };
 

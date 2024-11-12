@@ -14,16 +14,8 @@ import {
 import Back from '../../assets/images/LeftArrow.png';
 import Bell from '../../assets/images/Bell.png';
 import Profile from '../../assets/images/Profile.png';
-import Down from '../../assets/images/Down.png';
-import Up from '../../assets/images/Up.png';
 import Phone from '../../assets/images/Phone.png';
-import Logout from '../../assets/images/Logout.png';
-import Facebook from '../../assets/images/FaceBook.png';
-import Insta from '../../assets/images/instagram.png';
-import Twitter from '../../assets/images/twitter.png';
-import Meta from '../../assets/images/meta.png';
 import {useNavigation} from '@react-navigation/native';
-import {ScrollView} from 'react-native-gesture-handler';
 import DefaultSettings from '../../components/UserProfile/DefaultSettings';
 import ProfileInfo from '../../components/UserProfile/ProfileInfo';
 const {width} = Dimensions.get('window');
