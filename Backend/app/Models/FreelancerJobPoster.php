@@ -13,7 +13,18 @@ class FreelancerJobPoster extends Authenticatable
     protected $table = 'freelancers_job_posters';
 
     protected $fillable = [
-        'name', 'email', 'password', 'role','profile_image',
+        'name', 
+        'email', 
+        'password', 
+        'role',
+        'profile_image',
+        'gender',
+        'username', // unique
+        'fullname',
+        'achievement',
+        'subhead', // or title
+        'skills',
+        'dob'
     ];
 
     protected $hidden = [
