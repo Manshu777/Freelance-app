@@ -156,7 +156,7 @@ const CoachRegistration = () => {
       if (response.ok) {
         Alert.alert('Done');
         setResponseMessage('Success: ' + JSON.stringify(data));
-        navigation.navigate('Home');
+        navigation.navigate('LoginSuccess');
       } else {
         Alert.alert('Error');
         setResponseMessage('Error: ' + JSON.stringify(data));
