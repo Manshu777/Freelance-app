@@ -18,9 +18,6 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import {useNavigation} from '@react-navigation/native';
 import * as ImagePicker from 'react-native-image-picker';
 
-
-
-
 const StudentRegistration = () => {
   const navigation = useNavigation();
   const [firstName, setFirstName] = useState('');
@@ -41,6 +38,13 @@ const StudentRegistration = () => {
   fiveYearsAgo.setFullYear(fiveYearsAgo.getFullYear() - 5);
 
   const validateEmail = email => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+
+  const handleDateChange = (event, selectedDate) => {
+    setShowDatePicker(false); // Close the picker
+    if (selectedDate) {
+      setDob(selectedDate);
+    }
+  };
 
   const handleChooseImage = () => {
     ImagePicker.launchImageLibrary(
@@ -101,7 +105,7 @@ const StudentRegistration = () => {
       } else {
         Alert.alert('Error');
         setResponseMessage('Error: ' + JSON.stringify(data));
-        console.log(JSON.stringify(data))
+        console.log(JSON.stringify(data));
       }
     } catch (error) {
       setResponseMessage('Network Error: ' + error.message);
@@ -171,13 +175,30 @@ const StudentRegistration = () => {
           onChangeText={setEmail}
           keyboardType="email-address"
         />
-        <TouchableOpacity
+
+
+         <TouchableOpacity
           onPress={() => setShowDatePicker(true)}
           style={styles.input}>
           <Text style={{color: dob ? '#000' : '#808080'}}>
             {dob ? dob.toDateString() : 'Select Date of Birth'}
           </Text>
         </TouchableOpacity>
+
+        {showDatePicker && (
+          <DateTimePicker
+            value={dob}
+            mode="date"
+            display="default"
+            maximumDate={fiveYearsAgo}
+            onChange={(event, selectedDate) => {
+              setShowDatePicker(false);
+              if (selectedDate) {
+                setDob(selectedDate);
+              }
+            }}
+          />
+        )}
 
 
         <TextInput
@@ -245,15 +266,16 @@ const styles = StyleSheet.create({
   input: {
     height: 50,
     borderColor: '#ccc',
+    color: '#808080',
     borderWidth: 1,
     borderRadius: 8,
     paddingHorizontal: 12,
     marginBottom: 12,
     backgroundColor: '#fff',
+    justifyContent: 'center',
   },
   imagePicker: {alignItems: 'center', marginBottom: 15},
   imagePickerText: {fontSize: 16, color: 'rgba(126,88,199,1)'},
-  imagePreview: {width: 100, height: 100, borderRadius: 50},
   imagePre: {width: 75, height: 75, borderRadius: 50},
   genderContainer: {
     flexDirection: 'row',
@@ -268,7 +290,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     marginHorizontal: 5,
   },
-  selectedGender: {backgroundColor: 'rgba(126,88,199,1)'},
+  selectedGender: {backgroundColor: '#FFB900'},
   checkboxContainer: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -278,18 +300,19 @@ const styles = StyleSheet.create({
     width: 20,
     height: 20,
     borderWidth: 1,
-    borderRadius: 15,
-    borderColor: '#333',
+    borderRadius: 5,
   },
-  checkboxSelected: {backgroundColor: 'rgba(126,88,199,1)'},
+  checkboxSelected: {backgroundColor: '#4CAF50'},
+  checkboxLabel: {fontSize: 16},
   registerButton: {
-    backgroundColor: 'rgba(126,88,199,1)',
-    paddingVertical: 12,
+    backgroundColor: '#4CAF50',
+    paddingVertical: 15,
     borderRadius: 8,
+    alignItems: 'center',
     marginTop: 20,
   },
+  buttonText: {fontSize: 18, color: '#fff', fontWeight: 'bold'},
   disabledButton: {backgroundColor: '#ccc'},
-  buttonText: {color: '#fff', textAlign: 'center', fontSize: 18},
 });
 
 export default StudentRegistration;
