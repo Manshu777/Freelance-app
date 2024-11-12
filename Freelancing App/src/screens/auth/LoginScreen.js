@@ -23,6 +23,10 @@ import Emailicon from '../../assets/images/GoogleLogo.png';
 import downicon from '../../assets/images/carat-down.png';
 import styles from '../../styles/styles';
 
+
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchData } from '../../slices/dataSlice';
+
 const LoginScreen = ({route}) => {
   const [selectedCountry, setSelectedCountry] = useState({
     name: 'India',
@@ -42,6 +46,17 @@ const LoginScreen = ({route}) => {
   const [role, setRole] = useState('');
   const navigation = useNavigation();
   const countriesPerPage = 15;
+
+
+  const dispatch = useDispatch();
+  const data = useSelector((state) => state.data.data);
+  const status = useSelector((state) => state.data.status);
+
+  useEffect(() => {
+    dispatch(fetchData());
+
+    console.warn(data)
+  }, [dispatch]);
 
   useEffect(() => {
     if (modalVisible) {

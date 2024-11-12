@@ -132,7 +132,7 @@ const Loginotpverify = ({route}) => {
             <TouchableOpacity
               style={styles.resendButton}
               onPress={handleSendOtp}>
-              <Text style={{color: '#FFB900'}}> Resend OTP</Text>
+              <Text style={{color: '#78e0cc'}}> Resend OTP</Text>
             </TouchableOpacity>
           </View>
         )}

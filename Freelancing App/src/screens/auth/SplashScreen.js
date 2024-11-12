@@ -152,7 +152,7 @@ const styles = StyleSheet.create({
   Cirdes: {
     height: 458,
     width: 458,
-    backgroundColor: '#FFB900',
+    backgroundColor: '#78e0cc',
     position: 'absolute',
     top: -256,
     right: -284,
@@ -213,7 +213,7 @@ const styles = StyleSheet.create({
   },
   button: {
     // backgroundColor: '#fff',
-    backgroundColor: '#FFB900',
+    backgroundColor: '#78e0cc',
 
     paddingVertical: 12,
     paddingHorizontal: 30,

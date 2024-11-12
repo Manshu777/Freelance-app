@@ -25,7 +25,8 @@ import Navigation from './src/components/navigation/Navigation';
 import Loading from './src/screens/Loading/Loading';
 
 // import Testing from './src/components/Testing';
-
+import { Provider } from 'react-redux';
+import { store } from './src/store/store';
 
 const Stack = createStackNavigator();
 
@@ -109,6 +110,7 @@ const App = () => {
   }
 
   return (
+    <Provider store={store}>
     <UserProvider>
       <UserContext.Consumer>
         {({userInfo, loading}) => {
@@ -159,6 +161,7 @@ const App = () => {
         }}
       </UserContext.Consumer>
     </UserProvider>
+    </Provider>
   );
 };
 export default App;
