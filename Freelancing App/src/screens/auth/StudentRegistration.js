@@ -22,7 +22,7 @@ const StudentRegistration = () => {
   const navigation = useNavigation();
   const route = useRoute(); // Get the route to access params
   const [UserName, setUserName] = useState('');
-  const [lastName, setLastName] = useState('');
+  const [FullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [dob, setDob] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
@@ -72,33 +72,71 @@ const StudentRegistration = () => {
     );
   };
 
-
-  
+  // const handleRegister = async () => {
+  //   setLoading(true);
+  //   try {
+  //     navigation.navigate('LoginSuccess');
+  //   } catch (error) {
+  //     console.error('Registration error:', error);
+  //     Alert.alert('An error occurred during registration.');
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
 
   const handleRegister = async () => {
-  
-  // if (!lastName || !contact) {
-  //   Alert.alert('Please fill all fields and choose an image');
-  //   return;
-  // }
+    if (!UserName || !FullName) {
+      Alert.alert('Please fill all fields and choose an image');
+      return;
+    }
 
-  
-  setLoading(true);
-  try {
-    
-    navigation.navigate('LoginSuccess');
-  } catch (error) {
-    console.error('Registration error:', error);
-    Alert.alert('An error occurred during registration.');
-  } finally {
-    setLoading(false);
-  }
-};
+    const formData = new FormData();
 
+    formData.append('image', {
+      uri: image.uri,
+      type: image.type,
+      name: image.fileName,
+    });
+    formData.append('First_Name', UserName);
+    formData.append('Full_Name', FullName);
+    formData.append('Email', email);
+    formData.append('Contact', contact);
+    formData.append('Date-Of-Birth', dob.toISOString().split('T')[0]);
+    formData.append('role', UserRole);
+    formData.append('gender', gender);
+    formData.append('password', password);
 
+    // const token = await AsyncStorage.getItem('userToken');
 
+    try {
+      setLoading(true);
+      const response = await fetch('http://10.0.2.2:8000/api/v1/user', {
+        method: 'POST',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'multipart/form-data',
+          Authorization: token ? `Bearer ${token}` : '',
+        },
+        body: formData,
+      });
 
- 
+      const data = await response.json();
+
+      if (response.ok) {
+        Alert.alert('Registration Successful');
+        setResponseMessage('Success: ' + JSON.stringify(data));
+        navigation.navigate('LoginSuccess');
+      } else {
+        Alert.alert('Error', 'Please try again');
+        setResponseMessage('Error: ' + JSON.stringify(data));
+      }
+    } catch (error) {
+      setResponseMessage('Network Error: ' + error.message);
+      Alert.alert('Network Error', error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const renderRoleOption = (label, value) => (
     <TouchableOpacity
@@ -166,9 +204,9 @@ const StudentRegistration = () => {
         <TextInput
           style={styles.input}
           placeholder="Full Name"
-          value={lastName}
+          value={FullName}
           placeholderTextColor="#808080"
-          onChangeText={setLastName}
+          onChangeText={setFullName}
         />
 
         {contactMethod === 'Email' ? (
@@ -230,38 +268,40 @@ const StudentRegistration = () => {
           {renderGenderOption('Other', 'other')}
         </View>
 
-        <View style={[styles.inputContainer, { paddingRight: 15 }]}>
-        <Image
-          source={require('../../assets/images/lock.png')}
-          style={{ width: 22.5, aspectRatio: 1 }}
-        />
-        <View
-          style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            width: '92.5%',
-            justifyContent: 'space-between',
-          }}>
-          <TextInput
-            placeholder="******"
-            placeholderTextColor={'#808080'}
-            secureTextEntry={!isPasswordVisible}
-            style={{width:'92.5%',color:'#808080'}}
-            value={password}
-            onChangeText={setPassword}
+        <View style={[styles.inputContainer, {paddingRight: 15}]}>
+          <Image
+            source={require('../../assets/images/lock.png')}
+            style={{width: 22.5, aspectRatio: 1}}
           />
-          <TouchableOpacity onPress={togglePasswordVisibility} style={styles.eyeButton}>
-            <Image
-              source={
-                isPasswordVisible
-                  ? require('../../assets/images/eye.png')
-                  : require('../../assets/images/eye-off.png')
-              }
-              style={{ width: 20, height: 20 }}
+          <View
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              width: '92.5%',
+              justifyContent: 'space-between',
+            }}>
+            <TextInput
+              placeholder="******"
+              placeholderTextColor={'#808080'}
+              secureTextEntry={!isPasswordVisible}
+              style={{width: '92.5%', color: '#808080'}}
+              value={password}
+              onChangeText={setPassword}
             />
-          </TouchableOpacity>
+            <TouchableOpacity
+              onPress={togglePasswordVisibility}
+              style={styles.eyeButton}>
+              <Image
+                source={
+                  isPasswordVisible
+                    ? require('../../assets/images/eye.png')
+                    : require('../../assets/images/eye-off.png')
+                }
+                style={{width: 20, height: 20}}
+              />
+            </TouchableOpacity>
+          </View>
         </View>
-      </View>
 
         <View style={{flexDirection: 'row', alignItems: 'flex-end', gap: 10}}>
           <TouchableOpacity
