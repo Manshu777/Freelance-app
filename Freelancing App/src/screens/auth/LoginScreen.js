@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigation } from '@react-navigation/native';
+import React, {useState, useEffect} from 'react';
+import {useNavigation} from '@react-navigation/native';
 import auth from '@react-native-firebase/auth';
 import {
   GoogleSignin,
@@ -23,10 +23,10 @@ import Emailicon from '../../assets/images/GoogleLogo.png';
 import downicon from '../../assets/images/carat-down.png';
 import styles from '../../styles/styles';
 
-import { useDispatch, useSelector } from 'react-redux';
-import { fetchData } from '../../slices/dataSlice';
+import {useDispatch, useSelector} from 'react-redux';
+import {fetchData} from '../../slices/dataSlice';
 
-const LoginScreen = ({ route }) => {
+const LoginScreen = ({route}) => {
   const [selectedCountry, setSelectedCountry] = useState({
     name: 'India',
     code: '+91',
@@ -46,8 +46,8 @@ const LoginScreen = ({ route }) => {
   const countriesPerPage = 15;
 
   const dispatch = useDispatch();
-  const data = useSelector((state) => state.data.data);
-  const status = useSelector((state) => state.data.status);
+  const data = useSelector(state => state.data.data);
+  const status = useSelector(state => state.data.status);
 
   useEffect(() => {
     dispatch(fetchData());
@@ -123,7 +123,12 @@ const LoginScreen = ({ route }) => {
   };
 
   async function signInWithPhoneNumber(phoneNumber) {
-    navigation.navigate('LoginOTPverify');
+    if (phoneNumber.length < 12) {
+      alert('Enter 10 Digit number')
+      phoneNumber = '+1' + phoneNumber;
+    }
+    console.log(phoneNumber)
+    navigation.navigate('LoginOTPverify',{phoneNumber : phoneNumber});
     // try {
     //   const confirmation = await auth().signInWithPhoneNumber(phoneNumber);
     //   setConfirm(confirmation);
@@ -176,18 +181,17 @@ const LoginScreen = ({ route }) => {
   }, []);
 
   const handleGoogleSignIn = async () => {
-
     const LogMethod = 'Email';
 
     setLoading(true);
     try {
       await GoogleSignin.hasPlayServices();
       const userInfo = await GoogleSignin.signIn();
-
+      // console.log(userInfo.data.user.email)
       if (userInfo && userInfo.data.user && userInfo.data.idToken) {
-        navigation.navigate('StudentRegistration', { LogMethod });
+        navigation.navigate('StudentRegistration', {logmethod: LogMethod, Emails : userInfo.data.user.email });
       } else {
-        throw { code: statusCodes.SIGN_IN_CANCELLED, message: 'Login canceled.' };
+        throw {code: statusCodes.SIGN_IN_CANCELLED, message: 'Login canceled.'};
       }
     } catch (error) {
       console.log('Full Error:', error);
@@ -231,7 +235,7 @@ const LoginScreen = ({ route }) => {
             {selectedCountry && (
               <>
                 <Image
-                  source={{ uri: selectedCountry.flag }}
+                  source={{uri: selectedCountry.flag}}
                   style={styles.flag}
                 />
                 <Text style={styles.countryCode}>{selectedCountry.code}</Text>
@@ -313,15 +317,15 @@ const LoginScreen = ({ route }) => {
             <Text style={styles.modalTitle}>Select Your Country</Text>
             <FlatList
               data={countryOptions}
-              keyExtractor={(item) => item.code}
-              renderItem={({ item }) => (
+              keyExtractor={item => item.code}
+              renderItem={({item}) => (
                 <TouchableOpacity
                   style={styles.countryItem}
                   onPress={() => {
                     setSelectedCountry(item);
                     setModalVisible(false);
                   }}>
-                  <Image source={{ uri: item.flag }} style={styles.flag} />
+                  <Image source={{uri: item.flag}} style={styles.flag} />
                   <Text style={styles.countryName}>{item.name}</Text>
                   <Text style={styles.countryCode}>{item.code}</Text>
                 </TouchableOpacity>

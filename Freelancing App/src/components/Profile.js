@@ -25,7 +25,7 @@ const Profile = () => {
 
 
   const handleEmailPress = () => {
-    navigation.navigate('User');
+    navigation.navigate('Profile');
   };
 
   const handleNotificatios = () => {

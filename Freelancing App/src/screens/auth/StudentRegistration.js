@@ -13,6 +13,7 @@ import {
   ActivityIndicator,
   Button,
 } from 'react-native';
+import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import {useNavigation, useRoute} from '@react-navigation/native';
@@ -20,18 +21,19 @@ import * as ImagePicker from 'react-native-image-picker';
 
 const StudentRegistration = () => {
   const navigation = useNavigation();
-  const route = useRoute(); // Get the route to access params
+  // const [contactMethod, setContactMethod] = useState('');
+  const route = useRoute();
   const [UserName, setUserName] = useState('');
   const [FullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
+  const [Phnumber, setPhnumber] = useState(60);
   const [dob, setDob] = useState(new Date());
-  const [showDatePicker, setShowDatePicker] = useState(false);
   const [RegAs, setRegAs] = useState('Student');
   const [password, setPassword] = useState('');
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
-  const [sportsCoach, setSportsCoach] = useState('');
   const [UserRole, setUserRole] = useState(null);
   const [gender, setGender] = useState(null);
+  const [showDatePicker, setShowDatePicker] = useState(false);
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [image, setImage] = useState(null);
   const [contact, setContact] = useState('');
@@ -39,7 +41,19 @@ const StudentRegistration = () => {
   const [responseMessage, setResponseMessage] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const contactMethod = route.params?.logmethod || 'Phone';
+  const contactMethod = route.params.logmethod;
+
+  useEffect(() => {
+    if (route.params?.Phnumber) {
+      setPhnumber(route.params.Phnumber);
+    }
+  }, [route.params]);
+
+  useEffect(() => {
+    if (route.params?.Emails) {
+      setEmail(route.params.Emails);
+    }
+  }, [route.params]);
 
   const togglePasswordVisibility = () => {
     setIsPasswordVisible(!isPasswordVisible);
@@ -84,59 +98,125 @@ const StudentRegistration = () => {
   //   }
   // };
 
-  const handleRegister = async () => {
-    if (!UserName || !FullName) {
-      Alert.alert('Please fill all fields and choose an image');
-      return;
-    }
+  // const handleRegister = async () => {
+  //   if (
+  //     !image ||
+  //     !UserName ||
+  //     !FullName ||
+  //     !email ||
+  //     !Phnumber ||
+  //     !password ||
+  //     !gender ||
+  //     !termsAccepted
+  //   ) {
+  //     Alert.alert('Please fill all fields and choose an image');
+  //     return;
+  //   }
 
-    const formData = new FormData();
+  //   const formData = new FormData();
+  //   formData.append('image', {
+  //     uri: image.uri,
+  //     type: image.type,
+  //     name: image.fileName,
+  //   });
+  //   formData.append('First_Name', UserName);
+  //   formData.append('Full_Name', FullName);
+  //   formData.append('Email', email);
+  //   formData.append('Contact', Phnumber);
+  //   formData.append('Date-Of-Birth', dob);
+  //   formData.append('role', RegAs);
+  //   formData.append('gender', gender);
+  //   formData.append('password', password);
 
-    formData.append('image', {
-      uri: image.uri,
-      type: image.type,
-      name: image.fileName,
+  //   try {
+  //     const response = await fetch('http://10.0.2.2:8000/api/v1/user', {
+  //       method: 'POST',
+  //       headers: {
+  //         Accept: 'application/json',
+  //         'Content-Type': 'multipart/form-data',
+  //       },
+  //       body: formData,
+  //     });
+    
+  //     const data = await response.json();
+  //     console.log('Response status:', response.status);
+  //     console.log('Response data:', data);
+    
+  //     if (response.ok) {
+  //       alert('Registration Successful');
+  //       navigation.navigate('Home');
+  //     } else {
+  //       Alert.alert('Registration Error');
+  //       setResponseMessage('Error: ' + JSON.stringify(data));
+  //     }
+  //   } catch (error) {
+  //     setResponseMessage('Network Error: ' + error.message);
+  //     console.error('Network Error:', error);
+  //   }
+  // };
+
+
+const handleRegister = async () => {
+  if (
+    !image ||
+    !UserName ||
+    !FullName ||
+    !email ||
+    !Phnumber ||
+    !password ||
+    !gender ||
+    !termsAccepted
+  ) {
+    Alert.alert('Please fill all fields and choose an image');
+    return;
+  }
+
+  const formData = new FormData();
+  formData.append('image', {
+    uri: image.uri,
+    type: image.type,
+    name: image.fileName,
+  });
+  formData.append('User_Name', UserName);
+  formData.append('Full_Name', FullName);
+  formData.append('Email', email);
+  formData.append('Contact', Phnumber);
+  formData.append('Date-Of-Birth', dob);
+  formData.append('role', RegAs);
+  formData.append('gender', gender);
+  formData.append('password', password);
+
+  try {
+    const response = await axios.post('http://10.0.2.2:8000/api/v1/user', formData, {
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'multipart/form-data',
+      },
     });
-    formData.append('First_Name', UserName);
-    formData.append('Full_Name', FullName);
-    formData.append('Email', email);
-    formData.append('Contact', contact);
-    formData.append('Date-Of-Birth', dob.toISOString().split('T')[0]);
-    formData.append('role', UserRole);
-    formData.append('gender', gender);
-    formData.append('password', password);
 
-    // const token = await AsyncStorage.getItem('userToken');
+    console.log('Response status:', response.status);
+    console.log('Response data:', response.data);
 
-    try {
-      setLoading(true);
-      const response = await fetch('http://10.0.2.2:8000/api/v1/user', {
-        method: 'POST',
-        headers: {
-          Accept: 'application/json',
-          'Content-Type': 'multipart/form-data',
-          Authorization: token ? `Bearer ${token}` : '',
-        },
-        body: formData,
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        Alert.alert('Registration Successful');
-        setResponseMessage('Success: ' + JSON.stringify(data));
-        navigation.navigate('LoginSuccess');
-      } else {
-        Alert.alert('Error', 'Please try again');
-        setResponseMessage('Error: ' + JSON.stringify(data));
-      }
-    } catch (error) {
-      setResponseMessage('Network Error: ' + error.message);
-      Alert.alert('Network Error', error.message);
-    } finally {
-      setLoading(false);
+    if (response.status === 200) {
+      alert('Registration Error');
+      // navigation.navigate('Home');
+    } else {
+      // Alert.alert('Registration Error');
+      navigation.navigate('LoginSuccess');
+      setResponseMessage('Error: ' + JSON.stringify(response.data));
     }
-  };
+  } catch (error) {
+    if (error.response) {
+      console.error('Error Response:', error.response.data); 
+      const errorMessage = error.response.data.message || 'Please check the form inputs.';
+      Alert.alert('Registration Error', errorMessage);
+    } else {
+      Alert.alert('Network Error', error.message);
+    }
+  }
+  
+};
+
 
   const renderRoleOption = (label, value) => (
     <TouchableOpacity
@@ -234,28 +314,15 @@ const StudentRegistration = () => {
           </>
         )}
 
-        <TouchableOpacity
-          onPress={() => setShowDatePicker(true)}
-          style={styles.input}>
-          <Text style={{color: dob ? '#000' : '#808080'}}>
-            {dob ? dob.toDateString() : 'Select Date of Birth'}
-          </Text>
-        </TouchableOpacity>
-
-        {showDatePicker && (
-          <DateTimePicker
-            value={dob}
-            mode="date"
-            display="default"
-            maximumDate={fiveYearsAgo}
-            onChange={(event, selectedDate) => {
-              setShowDatePicker(false);
-              if (selectedDate) {
-                setDob(selectedDate);
-              }
-            }}
-          />
-        )}
+        <TextInput
+          style={styles.input}
+          keyboardType="numeric"
+          value={dob}
+          onChangeText={setDob}
+          placeholderTextColor="#808080"
+          placeholder="Enter your Age"
+          maxLength={2}
+        />
 
         <View style={styles.genderContainer}>
           {renderRoleOption('Freelancer', 'Freelancer')}
