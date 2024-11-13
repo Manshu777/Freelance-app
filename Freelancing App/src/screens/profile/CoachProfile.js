@@ -11,7 +11,7 @@ import {
   FlatList,
 } from 'react-native';
 import CoachDp from '../../assets/images/Rishav.jpg';
-import Education from '../../assets/images/Education.png';
+
 import Verifyed from '../../assets/images/Verifyed.png';
 import Star from '../../assets/images/Star.png';
 import Exp from '../../assets/images/Exp.png';
@@ -19,6 +19,9 @@ import Lang from '../../assets/images/Lang.png';
 import styles from '../../styles/CoachProfilecss';
 import Coaches from '../../components/Coaches';
 import ReviewList from '../../components/ReviewList';
+import AboutUs from '../../components/Coach/AboutUs';
+import Education from '../../components/Coach/Education';
+import Projects from '../../components/Coach/Projects';
 
 const {width, height} = Dimensions.get('window');
 
@@ -28,105 +31,104 @@ const CoachProfile = () => {
   const [currentAwardImageIndex, setCurrentAwardImageIndex] = useState(0);
   const navigation = useNavigation();
 
-  const coaches = [
-    {
-      description:
-        'I’m Rishav Agnihotri8u, a dedicated coach with a passion for football, tennis, and basketball. My journey spans from player to coach, focusing on skill development and personal growth. I’m committed to helping athletes of all levels reach their full potential.',
-    },
-    {
-      category: 'Football Coaches',
-      description:
-        'Experienced professionals focusing on technical skills, tactical awareness, and fitness. They help players of all levels develop their game and passion for football.',
-      expertise:
-        'Experts in technique and strategy, dedicated to improving your game. They offer personalized coaching to help players of all ages enhance their skills.',
-    },
-    {
-      category: 'Tennis Coaches',
-      description:
-        'Dynamic and experienced, focusing on skill development, game strategy, and teamwork. They tailor sessions to individual needs, fostering growth and sportsmanship.',
-    },
-    {
-      category: 'Basketball Coaches',
-      description:
-        'Dynamic and experienced, focusing on skill development, game strategy, and teamwork. They tailor sessions to individual needs, fostering growth and sportsmanship.',
-    },
-  ];
+  //   {
+  //     description:
+  //       'I’m Rishav Agnihotri8u, a dedicated coach with a passion for football, tennis, and basketball. My journey spans from player to coach, focusing on skill development and personal growth. I’m committed to helping athletes of all levels reach their full potential.',
+  //   },
+  //   {
+  //     category: 'Football Coaches',
+  //     description:
+  //       'Experienced professionals focusing on technical skills, tactical awareness, and fitness. They help players of all levels develop their game and passion for football.',
+  //     expertise:
+  //       'Experts in technique and strategy, dedicated to improving your game. They offer personalized coaching to help players of all ages enhance their skills.',
+  //   },
+  //   {
+  //     category: 'Tennis Coaches',
+  //     description:
+  //       'Dynamic and experienced, focusing on skill development, game strategy, and teamwork. They tailor sessions to individual needs, fostering growth and sportsmanship.',
+  //   },
+  //   {
+  //     category: 'Basketball Coaches',
+  //     description:
+  //       'Dynamic and experienced, focusing on skill development, game strategy, and teamwork. They tailor sessions to individual needs, fostering growth and sportsmanship.',
+  //   },
+  // ];
 
-  const achievements = [
-    {
-      title: 'Certificates',
-      description:
-        'Over the years, I’ve been honored with various awards for excellence in coaching and sports training, recognizing my commitment to developing athletes, innovative training methods, and significant contributions to youth sports.',
-    },
-    {
-      title: 'Certified Sports Coach',
-      description:
-        'Accredited certification in advanced coaching techniques for football, tennis, and basketball, ensuring high standards in training and development.',
-    },
-    {
-      title: 'Certificates',
-      images: [
-        {
-          id: 1,
-          url: require('../../assets/images/Certificates.png'),
-          description: 'Advanced Coaching Certificate for Football',
-        },
-        {
-          id: 2,
-          url: require('../../assets/images/Certificates.png'),
-          description: 'Tennis Coaching Certification',
-        },
-        {
-          id: 3,
-          url: require('../../assets/images/Certificates.png'),
-          description: 'Basketball Coaching Excellence Award',
-        },
-        {
-          id: 4,
-          url: require('../../assets/images/Certificates.png'),
-          description: 'Basketball Coaching Excellence Award',
-        },
-        {
-          id: 5,
-          url: require('../../assets/images/Certificates.png'),
-          description: 'Basketball Coaching Excellence Award',
-        },
-      ],
-    },
-  ];
+  // const achievements = [
+  //   {
+  //     title: 'Certificates',
+  //     description:
+  //       'Over the years, I’ve been honored with various awards for excellence in coaching and sports training, recognizing my commitment to developing athletes, innovative training methods, and significant contributions to youth sports.',
+  //   },
+  //   {
+  //     title: 'Certified Sports Coach',
+  //     description:
+  //       'Accredited certification in advanced coaching techniques for football, tennis, and basketball, ensuring high standards in training and development.',
+  //   },
+  //   {
+  //     title: 'Certificates',
+  //     images: [
+  //       {
+  //         id: 1,
+  //         url: require('../../assets/images/Certificates.png'),
+  //         description: 'Advanced Coaching Certificate for Football',
+  //       },
+  //       {
+  //         id: 2,
+  //         url: require('../../assets/images/Certificates.png'),
+  //         description: 'Tennis Coaching Certification',
+  //       },
+  //       {
+  //         id: 3,
+  //         url: require('../../assets/images/Certificates.png'),
+  //         description: 'Basketball Coaching Excellence Award',
+  //       },
+  //       {
+  //         id: 4,
+  //         url: require('../../assets/images/Certificates.png'),
+  //         description: 'Basketball Coaching Excellence Award',
+  //       },
+  //       {
+  //         id: 5,
+  //         url: require('../../assets/images/Certificates.png'),
+  //         description: 'Basketball Coaching Excellence Award',
+  //       },
+  //     ],
+  //   },
+  // ];
 
-  const Awards = [
-    {
-      title: 'Awards',
-      description:
-        'Over the years, I’ve been honored with various awards for excellence in coaching and sports training, recognizing my commitment to developing athletes, innovative training methods, and significant contributions to youth sports.',
-    },
-    {
-      title: 'Certified Sports Coach',
-      description:
-        'Accredited certification in advanced coaching techniques for football, tennis, and basketball, ensuring high standards in training and development.',
-    },
-    {
-      title: 'Certificates',
-      images: [
-        {
-          id: 1,
-          url: require('../../assets/images/Certificates.png'),
-          description: 'Advanced Coaching Certificate for Football',
-        },
-        {
-          id: 2,
-          url: require('../../assets/images/Certificates.png'),
-          description: 'Tennis Coaching Certification',
-        },
-        {
-          id: 3,
-          url: require('../../assets/images/Certificates.png'),
-          description: 'Basketball Coaching Excellence Award',
-        },
-      ],
-    },
-  ];
+  // const Awards = [
+  //   {
+  //     title: 'Awards',
+  //     description:
+  //       'Over the years, I’ve been honored with various awards for excellence in coaching and sports training, recognizing my commitment to developing athletes, innovative training methods, and significant contributions to youth sports.',
+  //   },
+  //   {
+  //     title: 'Certified Sports Coach',
+  //     description:
+  //       'Accredited certification in advanced coaching techniques for football, tennis, and basketball, ensuring high standards in training and development.',
+  //   },
+  //   {
+  //     title: 'Certificates',
+  //     images: [
+  //       {
+  //         id: 1,
+  //         url: require('../../assets/images/Certificates.png'),
+  //         description: 'Advanced Coaching Certificate for Football',
+  //       },
+  //       {
+  //         id: 2,
+  //         url: require('../../assets/images/Certificates.png'),
+  //         description: 'Tennis Coaching Certification',
+  //       },
+  //       {
+  //         id: 3,
+  //         url: require('../../assets/images/Certificates.png'),
+  //         description: 'Basketball Coaching Excellence Award',
+  //       },
+  //     ],
+  //   },
+  // ];
 
   const [activeImageIndex, setActiveImageIndex] = useState(0);
 
@@ -175,7 +177,7 @@ const CoachProfile = () => {
             </Text>
 
             <View style={styles.certificateContainer}>
-              <Image 
+              <Image
                 source={achievements[2].images[activeImageIndex].url}
                 style={styles.certificateImage}
               />
@@ -304,7 +306,10 @@ const CoachProfile = () => {
                       alignItems: 'center',
                       gap: 10,
                     }}>
-                    <Image source={Education} style={{width: 20, height: 20}} />
+                    <Image
+                      source={require('../../assets/images/Education.png')}
+                      style={{width: 20, height: 20}}
+                    />
                     <Text
                       style={{
                         color: '#616161',
@@ -372,56 +377,9 @@ const CoachProfile = () => {
         </View>
 
         <View style={styles.containerDetails}>
-          {/* Buttons Row */}
-          <View style={styles.buttonRow}>
-            <TouchableOpacity
-              style={[
-                styles.button,
-                activeSection === 'AboutUs' && styles.activeButton,
-              ]}
-              onPress={() => setActiveSection('AboutUs')}>
-              <Text
-                style={[
-                  styles.buttonText,
-                  activeSection === 'AboutUs' && styles.activeButtonText,
-                ]}>
-                About Us
-              </Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={[
-                styles.button,
-                activeSection === 'Certificates' && styles.activeButton,
-              ]}
-              onPress={() => setActiveSection('Certificates')}>
-              <Text
-                style={[
-                  styles.buttonText,
-                  activeSection === 'Certificates' && styles.activeButtonText,
-                ]}>
-                Certificates
-              </Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={[
-                styles.button,
-                activeSection === 'Awards' && styles.activeButton,
-              ]}
-              onPress={() => setActiveSection('Awards')}>
-              <Text
-                style={[
-                  styles.buttonText,
-                  activeSection === 'Awards' && styles.activeButtonText,
-                ]}>
-                Awards
-              </Text>
-            </TouchableOpacity>
-          </View>
-
-          {/* Content Section */}
-          <View style={styles.contentContainer}>{renderContent()}</View>
+          <AboutUs />
+          <Education />
+          <Projects />
         </View>
 
         <ReviewList />

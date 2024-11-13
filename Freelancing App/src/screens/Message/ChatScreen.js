@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import {
   Dimensions,
   FlatList,
@@ -11,7 +11,7 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
-import {useNavigation} from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 
 import Tick from '../../assets/images/Tick.png';
 import BlueTick from '../../assets/images/BlueTick.png';
@@ -19,14 +19,14 @@ import CoachDp from '../../assets/images/My.png';
 import UserDp from '../../assets/images/CoachDp.webp';
 import Back from '../../assets/images/LeftArrow.png';
 
-const {width} = Dimensions.get('window');
+const { width } = Dimensions.get('window');
 
-const ChatScreen = ({route}) => {
+const ChatScreen = ({ route }) => {
   const navigation = useNavigation();
 
-  const {coach} = route.params;
+  // const { coach } = route.params;
   const [messages, setMessages] = useState([
-    {id: '1', text: 'Hi, how are you?', isSender: false, seen: true},
+    { id: '1', text: 'Hi, how are you?', isSender: false, seen: true },
     {
       id: '2',
       text: 'I am good, thank you! How about you?',
@@ -44,7 +44,7 @@ const ChatScreen = ({route}) => {
 
   const sendMessage = () => {
     if (newMessage.trim()) {
-      setMessages(prev => [
+      setMessages((prev) => [
         ...prev,
         {
           id: Date.now().toString(),
@@ -61,16 +61,18 @@ const ChatScreen = ({route}) => {
     navigation.goBack();
   };
 
-  const renderMessage = ({item}) => (
+  const renderMessage = ({ item }) => (
     <View
-      style={[styles.message, item.isSender ? styles.sender : styles.receiver]}>
+      style={[styles.message, item.isSender ? styles.sender : styles.receiver]}
+    >
       {!item.isSender && <Image source={CoachDp} style={styles.avatar} />}
       <View style={styles.messageContent}>
         <Text
           style={[
             styles.text,
             item.isSender ? styles.Textsender : styles.Textreceiver,
-          ]}>
+          ]}
+        >
           {item.text}
         </Text>
         {item.isSender && (
@@ -86,21 +88,23 @@ const ChatScreen = ({route}) => {
       <View style={styles.headerssection}>
         <TouchableOpacity
           style={styles.backButtonContainer}
-          onPress={handleBackPress}>
+          onPress={handleBackPress}
+        >
           <Image source={Back} style={styles.backButtonIcon} />
         </TouchableOpacity>
-        <Text style={styles.header}>{coach.name}</Text>
+        <Text style={styles.header}>Xyz</Text>
       </View>
       <FlatList
         data={messages}
         renderItem={renderMessage}
-        keyExtractor={item => item.id}
+        keyExtractor={(item) => item.id}
         inverted
         style={styles.chatList}
       />
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        style={styles.inputContainer}>
+        style={styles.inputContainer}
+      >
         <TextInput
           value={newMessage}
           onChangeText={setNewMessage}
@@ -118,7 +122,7 @@ const ChatScreen = ({route}) => {
 export default ChatScreen;
 
 const styles = StyleSheet.create({
-  container: {flex: 1, backgroundColor: '#FAFAFA'},
+  container: { flex: 1, backgroundColor: '#FAFAFA' },
   backButtonContainer: {
     padding: 10,
   },
@@ -127,19 +131,12 @@ const styles = StyleSheet.create({
     aspectRatio: 1,
   },
   headerssection: {
-    flex:0,
-    alignItems:'center',
-    justifyContent:'flex-start',
-    flexDirection:'row',
+    flex: 0,
+    alignItems: 'center',
+    justifyContent: 'flex-start',
+    flexDirection: 'row',
     backgroundColor: '#000a24',
     padding: 16,
-  },
-  backButtonContainer: {
-    padding: 10,
-  },
-  backButtonIcon: {
-    height: 25,
-    aspectRatio: 1,
   },
   header: {
     textAlign: 'center',
@@ -147,7 +144,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#fff',
   },
-  chatList: {paddingHorizontal: 16, flex: 1},
+  chatList: { paddingHorizontal: 16, flex: 1 },
   message: {
     flexDirection: 'row',
     marginVertical: 4,
@@ -175,9 +172,9 @@ const styles = StyleSheet.create({
     alignItems: 'flex-end',
     maxWidth: '85%',
   },
-  text: {fontSize: 16, color: '#fff'},
-  tickIcon: {width: 15, height: 15, marginLeft: 5},
-  avatar: {width: 40, height: 40, borderRadius: 20, marginHorizontal: 0},
+  text: { fontSize: 16, color: '#fff' },
+  tickIcon: { width: 15, height: 15, marginLeft: 5 },
+  avatar: { width: 40, height: 40, borderRadius: 20, marginHorizontal: 0 },
   inputContainer: {
     flexDirection: 'row',
     padding: 10,
@@ -201,5 +198,5 @@ const styles = StyleSheet.create({
   Textsender: {
     color: 'black',
   },
-  sendText: {color: '#fff', fontSize: 16},
+  sendText: { color: '#fff', fontSize: 16 },
 });

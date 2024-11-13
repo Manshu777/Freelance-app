@@ -189,8 +189,9 @@ const styles = StyleSheet.create({
     borderColor: '#ccc',
   },
   serviceName: {
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: 'bold',
+    color:'#000'
   },
   serviceDescription: {
     fontSize: 14,

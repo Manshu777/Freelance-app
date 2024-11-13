@@ -6,28 +6,34 @@ import {
   TextInput,
   Image,
   Linking,
+  Alert,
 } from 'react-native';
 import mobileVerify from '../../assets/images/mobileVerify.png';
 import MobileAlt from '../../assets/images/Mobile-alt.png';
 import styles from '../../styles/styles';
-import {useNavigation} from '@react-navigation/native';
+import {useNavigation, useRoute} from '@react-navigation/native';
 
-const Loginotpverify = ({route}) => {
+const Loginotpverify = () => {
   const navigation = useNavigation();
+  const route = useRoute();
   const {contactInfo = '', isEmail = false} = route.params || {};
-
+  
+  const [Phnumber, setPhnumber] = useState(60);
   const [otp, setOtp] = useState(['', '', '', '', '', '']);
   const [timer, setTimer] = useState(60);
-  const [role, setRole] = useState('');
   const [isOtpSent, setIsOtpSent] = useState(false);
   const inputRefs = Array.from({length: 6}, () => useRef(null));
 
+  
+  // console.log(Phnumber);
+
   useEffect(() => {
-    if (route.params?.role) {
-      console.log(route.params.role);
-      setRole(route.params.role);
+    if (route.params?.phoneNumber) {
+      setPhnumber(route.params.phoneNumber);
     }
   }, [route.params]);
+
+
 
   useEffect(() => {
     let interval;
@@ -55,26 +61,16 @@ const Loginotpverify = ({route}) => {
   };
 
   const handleVerifyOtp = async () => {
-    if (!role) {
-      Alert.alert('Select Role', 'Please select a role before signing in.');
-      return;
-    }
-
     const fullOtp = otp.join('');
-    if (fullOtp.length === 6) {
-      // console.log(role);
-      handlePhoneLogin(role);
-      // navigation.navigate('LoginSuccess');
-    } else {
-      alert('Please enter a valid 6-digit OTP');
-    }
-  };
+    const LogMethod = 'Phone';
 
-  const handlePhoneLogin = role => {
-    if (role === 'Student') {
-      navigation.navigate('StudentRegistration', role);
-    } else if (role === 'Coach') {
-      navigation.navigate('CoachRegistration', {logmethod: 'Phone', role});
+    if (fullOtp.length === 6) {
+      navigation.navigate('StudentRegistration', {
+        logmethod: LogMethod,
+        Phnumber: Phnumber,
+      });
+    } else {
+      Alert.alert('Invalid OTP', 'Please enter a valid 6-digit OTP');
     }
   };
 
@@ -127,12 +123,12 @@ const Loginotpverify = ({route}) => {
         {isOtpSent && timer > 0 ? (
           <Text style={styles.timerText}>Resend OTP in {timer}s</Text>
         ) : (
-          <View style={{flexDirection:'row'}}>
+          <View style={{flexDirection: 'row'}}>
             <Text style={{color: 'white'}}>Didn't receive?</Text>
             <TouchableOpacity
               style={styles.resendButton}
               onPress={handleSendOtp}>
-              <Text style={{color: '#78e0cc'}}> Resend OTP</Text>
+              <Text style={{color: '#78e0cc'}}>  Resend OTP</Text>
             </TouchableOpacity>
           </View>
         )}

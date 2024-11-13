@@ -23,9 +23,8 @@ import Emailicon from '../../assets/images/GoogleLogo.png';
 import downicon from '../../assets/images/carat-down.png';
 import styles from '../../styles/styles';
 
-
-import { useDispatch, useSelector } from 'react-redux';
-import { fetchData } from '../../slices/dataSlice';
+import {useDispatch, useSelector} from 'react-redux';
+import {fetchData} from '../../slices/dataSlice';
 
 const LoginScreen = ({route}) => {
   const [selectedCountry, setSelectedCountry] = useState({
@@ -43,19 +42,15 @@ const LoginScreen = ({route}) => {
   const [isMoreLoading, setIsMoreLoading] = useState(false);
   const [confirm, setConfirm] = useState(null);
   const [code, setCode] = useState('');
-  const [role, setRole] = useState('');
   const navigation = useNavigation();
   const countriesPerPage = 15;
 
-
   const dispatch = useDispatch();
-  const data = useSelector((state) => state.data.data);
-  const status = useSelector((state) => state.data.status);
+  const data = useSelector(state => state.data.data);
+  const status = useSelector(state => state.data.status);
 
   useEffect(() => {
     dispatch(fetchData());
-
-    console.warn(data)
   }, [dispatch]);
 
   useEffect(() => {
@@ -63,12 +58,6 @@ const LoginScreen = ({route}) => {
       loadInitialCountries();
     }
   }, [modalVisible]);
-
-  useEffect(() => {
-    if (route.params?.role) {
-      setRole(route.params.role);
-    }
-  }, [route.params]);
 
   const fetchCountryData = async () => {
     try {
@@ -134,24 +123,23 @@ const LoginScreen = ({route}) => {
   };
 
   async function signInWithPhoneNumber(phoneNumber) {
-    if (!role) {
-      Alert.alert('Select Role', 'Please select a role before signing in.');
-      return;
+    if (phoneNumber.length < 12) {
+      alert('Enter 10 Digit number')
+      phoneNumber = '+1' + phoneNumber;
     }
-
-    try {
-      const confirmation = await auth().signInWithPhoneNumber(phoneNumber);
-      setConfirm(confirmation);
-      Alert.alert(
-        'OTP Sent',
-        'Please check your phone for the verification code.',
-      );
-      // handlePhoneLogin(role);
-      navigation.navigate('LoginOTPverify',{role});
-    } catch (error) {
-      console.error('Error during phone number sign-in:', error);
-      setErrorMessage('Failed to send OTP. Please try again.');
-    }
+    console.log(phoneNumber)
+    navigation.navigate('LoginOTPverify',{phoneNumber : phoneNumber});
+    // try {
+    //   const confirmation = await auth().signInWithPhoneNumber(phoneNumber);
+    //   setConfirm(confirmation);
+    //   Alert.alert(
+    //     'OTP Sent',
+    //     'Please check your phone for the verification code.',
+    //   );
+    // } catch (error) {
+    //   console.error('Error during phone number sign-in:', error);
+    //   setErrorMessage('Failed to send OTP. Please try again.');
+    // }
   }
 
   async function confirmCode() {
@@ -193,18 +181,15 @@ const LoginScreen = ({route}) => {
   }, []);
 
   const handleGoogleSignIn = async () => {
-    if (!role) {
-      Alert.alert('Select Role', 'Please select a role before signing in.');
-      return;
-    }
+    const LogMethod = 'Email';
 
     setLoading(true);
     try {
       await GoogleSignin.hasPlayServices();
       const userInfo = await GoogleSignin.signIn();
-
+      // console.log(userInfo.data.user.email)
       if (userInfo && userInfo.data.user && userInfo.data.idToken) {
-        handleEmailLogin(role, userInfo);
+        navigation.navigate('StudentRegistration', {logmethod: LogMethod, Emails : userInfo.data.user.email });
       } else {
         throw {code: statusCodes.SIGN_IN_CANCELLED, message: 'Login canceled.'};
       }
@@ -221,14 +206,6 @@ const LoginScreen = ({route}) => {
       }
     } finally {
       setLoading(false);
-    }
-  };
-
-  const handleEmailLogin = (role, userInfo) => {
-    if (role === 'Student') {
-      navigation.navigate('StudentRegistration',{userInfo,role});
-    } else if (role === 'Coach') {
-      navigation.navigate('CoachRegistration', {userInfo, logmethod: 'Email',role});
     }
   };
 
@@ -331,20 +308,19 @@ const LoginScreen = ({route}) => {
       </View>
 
       <Modal
-        animationType="slide"
-        transparent={true}
         visible={modalVisible}
+        transparent={true}
+        animationType="slide"
         onRequestClose={() => setModalVisible(false)}>
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Select Your Country</Text>
             <FlatList
               data={countryOptions}
-              keyExtractor={(item, index) =>
-                `${item.name}-${item.code}-${index}`
-              }
+              keyExtractor={item => item.code}
               renderItem={({item}) => (
                 <TouchableOpacity
-                  style={styles.countryOption}
+                  style={styles.countryItem}
                   onPress={() => {
                     setSelectedCountry(item);
                     setModalVisible(false);
@@ -358,11 +334,6 @@ const LoginScreen = ({route}) => {
               onEndReachedThreshold={0.5}
               ListFooterComponent={renderFooter}
             />
-            <TouchableOpacity
-              onPress={() => setModalVisible(false)}
-              style={styles.closeButton}>
-              <Text style={styles.closeButtonText}>Close</Text>
-            </TouchableOpacity>
           </View>
         </View>
       </Modal>

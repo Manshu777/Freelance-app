@@ -40,10 +40,6 @@ return [
             'driver' => 'session',
             'provider' => 'users',
         ],
-        'freelancers_job_posters' => [
-            'driver' => 'sanctum', // Or 'session' if using session-based authentication
-            'provider' => 'freelancers_job_posters', // This is the provider we'll define below
-        ],
     ],
 
     /*
@@ -68,14 +64,11 @@ return [
             'driver' => 'eloquent',
             'model' => env('AUTH_MODEL', App\Models\User::class),
         ],
-        'freelancers_job_posters' => [
-            'driver' => 'eloquent',
-            'model' => App\Models\FreelancerJobPoster::class,
-        ],
 
         // 'users' => [
         //     'driver' => 'database',
         //     'table' => 'users',
+        // ],
     ],
 
     /*

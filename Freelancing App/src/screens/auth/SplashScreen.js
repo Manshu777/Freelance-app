@@ -131,7 +131,7 @@ const SplashScreen = () => {
           {renderDots()}
         <TouchableOpacity
           style={styles.button}
-          onPress={() => navigation.navigate('Selection')}>
+          onPress={() => navigation.navigate('Home')}>
           <Text style={styles.buttonText}>Let's Get Started</Text>
         </TouchableOpacity>
       </View>
